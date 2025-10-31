@@ -14,7 +14,7 @@ python-multipart==0.0.6
 
 # AI/ML optimized for Render
 deepface==0.0.79
-tensorflow-cpu==2.16.1
+tensorflow-cpu==2.20.0
 opencv-python-headless==4.8.1.78
 numpy==1.24.3
 pillow==10.0.1
