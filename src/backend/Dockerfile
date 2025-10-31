@@ -2,29 +2,30 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Instalar dependências do sistema
+# Atualizar package lists e instalar dependências básicas
 RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
+    build-essential \
     libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    libgthread-2.0-0 \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar requirements
+# Copiar requirements primeiro para cache do Docker
 COPY requirements_production.txt .
 
-# Instalar dependências Python
-RUN pip install --no-cache-dir -r requirements_production.txt
+# Instalar dependências Python com timeout maior
+RUN pip install --no-cache-dir --timeout=1000 -r requirements_production.txt
 
-# Copiar código
+# Copiar código da aplicação
 COPY app/ ./app/
 COPY production_server.py .
 
-# Expor porta
+# Expor porta para Railway
 EXPOSE 8001
 
 # Comando de inicialização
