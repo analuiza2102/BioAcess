@@ -1,0 +1,575 @@
+/* PÁGINA LOGIN - Backgrounds separados por tema */
+
+/* TEMA CLARO - Padrão com scroll natural */
+.login-page {
+  min-height: 100vh !important;
+  padding: 20px !important;
+  transition: all 0.3s ease !important;
+  overflow-y: auto !important;
+  /* TEMA CLARO - Fundo branco suave */
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%) !important;
+  color: #1f2937 !important;
+}
+
+/* TEMA ESCURO - Apenas quando classe .dark estiver presente */
+.dark .login-page {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #262626 100%) !important;
+  color: #fafafa !important;
+}
+
+/* TEMA CLARO - Cores de texto */
+.login-page .text-gray-800 {
+  color: #1f2937 !important;
+}
+
+.login-page .text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.login-page .font-medium {
+  color: #111827 !important;
+}
+
+/* TEMA ESCURO - Cores de texto */
+.dark .login-page .text-gray-800,
+.dark .login-page .dark\:text-white {
+  color: #fafafa !important;
+}
+
+.dark .login-page .text-gray-600,
+.dark .login-page .dark\:text-gray-300 {
+  color: #a3a3a3 !important;
+}
+
+.dark .login-page .font-medium {
+  color: #ffffff !important;
+}
+
+/* Backgrounds responsivos */
+.login-page .bg-white\/80,
+.login-page .backdrop-blur-sm {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.dark .login-page .bg-white\/80,
+.dark .login-page .backdrop-blur-sm {
+  background: rgba(26, 26, 26, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid #404040 !important;
+}
+
+/* CONTAINER PRINCIPAL - Com scroll natural */
+.bioaccess-container {
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  overflow-y: auto !important;
+}
+
+/* CARD PRINCIPAL - Tamanho otimizado para responsividade */
+.bioaccess-card {
+  /* TEMA CLARO - Efeito Glass/Gelo */
+  background: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 20px !important;
+  padding: 24px !important;
+  box-shadow: 0 8px 32px rgba(81, 82, 92, 0.37) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  max-width: 990px !important;
+  width: 95% !important;
+  margin: 0 auto !important;
+  height: fit-content !important;
+  transition: all 0.3s ease !important;
+}
+
+/* TEMA ESCURO - Apenas quando classe .dark estiver presente */
+.dark .bioaccess-card {
+  background: rgba(26, 26, 26, 0.25) !important;
+  border: 1px solid rgba(64, 64, 64, 0.3) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37) !important;
+}
+
+/* RESPONSIVIDADE COMPLETA */
+
+/* Desktop Grande (1200px+) */
+@media (min-width: 1200px) {
+  .bioaccess-card {
+    max-width: 990px !important;
+    padding: 32px !important;
+  }
+}
+
+/* Desktop Médio (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .bioaccess-card {
+    max-width: 900px !important;
+    width: 90% !important;
+    padding: 28px !important;
+  }
+}
+
+/* Tablet (768px - 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .bioaccess-card {
+    max-width: 700px !important;
+    width: 90% !important;
+    padding: 24px !important;
+  }
+}
+
+/* Mobile (até 767px) */
+@media (max-width: 767px) {
+  .login-page {
+    padding: 10px !important;
+    min-height: 100vh !important;
+  }
+  
+  .bioaccess-container {
+    padding: 10px !important;
+    min-height: auto !important;
+    display: block !important;
+  }
+  
+  .bioaccess-card {
+    width: calc(100vw - 20px) !important;
+    padding: 20px !important;
+    max-width: none !important;
+    margin: 20px auto !important;
+  }
+}
+
+.bioaccess-logo {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 16px !important;
+  transition: all 0.3s ease !important;
+  /* TEMA CLARO - Padrão */
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3) !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-logo {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* TÍTULO - Espaçamentos ajustados */
+.bioaccess-title {
+  font-size: 1.875rem !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  margin-bottom: 6px !important;
+  transition: all 0.3s ease !important;
+  /* TEMA CLARO - Cores ajustadas para fundo branco */
+  color: #2d3748 !important;
+  text-shadow: none !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-title {
+  color: #fafafa !important;
+  text-shadow: none !important;
+}
+
+/* SUBTÍTULO - Espaçamentos reduzidos */
+.bioaccess-subtitle {
+  font-size: 1rem !important;
+  text-align: center !important;
+  margin-bottom: 20px !important;
+  transition: all 0.3s ease !important;
+  /* TEMA CLARO - Cores ajustadas para fundo branco */
+  color: #4a5568 !important;
+  text-shadow: none !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-subtitle {
+  color: #a3a3a3 !important;
+  text-shadow: none !important;
+}
+
+/* TABS DE NAVEGAÇÃO - Espaçamentos reduzidos */
+.bioaccess-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 4px !important;
+  /* TEMA CLARO - Background ajustado para efeito glass */
+  background: rgba(255, 255, 255, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border-radius: 10px !important;
+  padding: 4px !important;
+  margin-bottom: 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-tabs {
+  background: #262626 !important;
+  border: 1px solid #404040 !important;
+}
+
+.bioaccess-tab {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px !important;
+  min-height: 70px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+  background: transparent !important;
+  border: none !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  /* TEMA CLARO - Padrão */
+  color: #6b7280 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-tab {
+  color: #a3a3a3 !important;
+}
+
+/* TAB ATIVA - TEMA CLARO */
+.bioaccess-tab.active {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3) !important;
+}
+
+/* TAB ATIVA - TEMA ESCURO */
+.dark .bioaccess-tab.active {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* TAB HOVER - TEMA CLARO */
+.bioaccess-tab:hover:not(.active) {
+  background: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* TAB HOVER - TEMA ESCURO */
+.dark .bioaccess-tab:hover:not(.active) {
+  background: #404040 !important;
+  color: #fafafa !important;
+}
+
+/* MOBILE - Tabs responsivas */
+@media (max-width: 767px) {
+  .bioaccess-tab {
+    padding: 10px !important;
+    min-height: 60px !important;
+  }
+}
+
+/* ÍCONE CENTRAL - Dimensões reduzidas */
+.bioaccess-center-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 50% !important;
+  margin: 0 auto 12px !important;
+  transition: all 0.3s ease !important;
+  /* TEMA CLARO - Cores ajustadas */
+  background: rgba(22, 163, 74, 0.15) !important;
+  border: 2px solid rgba(22, 163, 74, 0.3) !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-center-icon {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 2px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+/* INPUTS - Altura 40px, Padding 40px esquerda */
+.bioaccess-input {
+  height: 40px !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+  padding-left: 40px !important;
+  font-size: 1rem !important;
+  transition: all 0.2s !important;
+  width: 100% !important;
+  /* TEMA CLARO - Padrão */
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #1f2937 !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-input {
+  background: #262626 !important;
+  border: 1px solid #404040 !important;
+  color: #fafafa !important;
+}
+
+/* FOCUS - TEMA CLARO */
+.bioaccess-input:focus {
+  outline: none !important;
+  border-color: #16a34a !important;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1) !important;
+}
+
+/* FOCUS - TEMA ESCURO */
+.dark .bioaccess-input:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* PLACEHOLDER - TEMA CLARO */
+.bioaccess-input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* PLACEHOLDER - TEMA ESCURO */
+.dark .bioaccess-input::placeholder {
+  color: #737373 !important;
+}
+
+/* LABELS - Espaçamentos Figma */
+.bioaccess-label {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin-bottom: 8px !important;
+  display: block !important;
+  transition: all 0.3s ease !important;
+  /* TEMA CLARO - Padrão */
+  color: #374151 !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-label {
+  color: #d4d4d8 !important;
+}
+
+/* TÍTULOS DENTRO DO CARD - TEMA CLARO */
+.bioaccess-card h3,
+.bioaccess-card .text-xl {
+  color: #1f2937 !important;
+  font-weight: 600 !important;
+}
+
+.bioaccess-card p,
+.bioaccess-card .text-sm {
+  color: #6b7280 !important;
+}
+
+/* TÍTULOS DENTRO DO CARD - TEMA ESCURO */
+.dark .bioaccess-card h3,
+.dark .bioaccess-card .text-xl {
+  color: #f9fafb !important;
+}
+
+.dark .bioaccess-card p,
+.dark .bioaccess-card .text-sm {
+  color: #d1d5db !important;
+}
+
+/* SOBRESCREVER CLASSES TAILWIND NO CARD */
+.bioaccess-card .font-semibold {
+  font-weight: 600 !important;
+}
+
+.bioaccess-card .mb-2 {
+  margin-bottom: 8px !important;
+}
+
+/* BOTÃO PRINCIPAL - Altura 48px (Large) */
+.bioaccess-button {
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 10px !important;
+  padding: 0 16px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  margin-top: 12px !important;
+  border: none !important;
+  color: #ffffff !important;
+  /* TEMA CLARO - Padrão */
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-button {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+}
+
+/* HOVER - TEMA CLARO */
+.bioaccess-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 25px rgba(22, 163, 74, 0.3) !important;
+}
+
+/* HOVER - TEMA ESCURO */
+.dark .bioaccess-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3) !important;
+}
+
+.bioaccess-button:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* INPUT WRAPPER - Espaçamentos reduzidos */
+.bioaccess-input-wrapper {
+  position: relative !important;
+  margin-bottom: 12px !important;
+}
+
+/* ÍCONES DOS INPUTS - 16x16px */
+.bioaccess-input-icon {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 16px !important;
+  height: 16px !important;
+  /* TEMA CLARO - Padrão */
+  color: #6b7280 !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-input-icon {
+  color: #737373 !important;
+}
+
+.bioaccess-input-icon-right {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+  /* TEMA CLARO - Padrão */
+  color: #6b7280 !important;
+}
+
+/* TEMA ESCURO */
+.dark .bioaccess-input-icon-right {
+  color: #737373 !important;
+}
+
+.bioaccess-input-icon-right:hover {
+  color: #374151 !important;
+}
+
+.dark .bioaccess-input-icon-right:hover {
+  color: #a3a3a3 !important;
+}
+
+
+
+/* BOTÃO DE TEMA - Posicionamento dentro do card */
+.theme-toggle-button {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  z-index: 10 !important;
+}
+
+/* TEMA CLARO - Botão de tema */
+.theme-toggle-button {
+  background: rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  color: #2d3748 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.theme-toggle-button:hover {
+  background: rgba(0, 0, 0, 0.12) !important;
+  transform: scale(1.05) !important;
+}
+
+/* TEMA ESCURO - Botão de tema */
+.dark .theme-toggle-button {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fafafa !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .theme-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* CORREÇÃO ESPECÍFICA PARA NOME DO USUÁRIO */
+
+/* TEMA CLARO - Nome do usuário em preto */
+.login-page p {
+  color: #374151 !important;
+}
+
+.login-page p span {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.login-page h2 {
+  color: #111827 !important;
+}
+
+/* TEMA ESCURO - Nome do usuário em branco */
+.dark .login-page p {
+  color: #9ca3af !important;
+}
+
+.dark .login-page p span {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.dark .login-page h2 {
+  color: #ffffff !important;
+}
+
+/* Força contraste em todos os textos da seção de reconhecimento */
+.login-page .text-center p {
+  color: #374151 !important;
+}
+
+.login-page .text-center p span {
+  color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+.dark .login-page .text-center p {
+  color: #9ca3af !important;
+}
+
+.dark .login-page .text-center p span {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
