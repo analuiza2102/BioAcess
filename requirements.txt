@@ -1,25 +1,24 @@
-# Core FastAPI
-fastapi==0.115.0
-uvicorn[standard]==0.32.0
+# Core FastAPI (otimizado)
+fastapi==0.104.1
+uvicorn==0.24.0
 
 # Database
-sqlalchemy==2.0.35
-psycopg2-binary==2.9.10
-supabase==2.8.1
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+supabase==2.0.2
 
 # Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 
-# AI/ML para biometria
+# AI/ML - versão CPU mais leve
 deepface==0.0.79
-tensorflow==2.19.1
-opencv-python-headless==4.10.0.84
-numpy==1.26.4
-pillow==10.4.0
+tensorflow-cpu==2.15.1
+opencv-python-headless==4.8.1.78
+numpy==1.24.3
+pillow==10.0.1
 
-# Utilities
+# Utilities básicas
 python-dotenv==1.0.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
+pydantic==2.4.2
