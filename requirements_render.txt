@@ -1,32 +1,18 @@
-# Configurações otimizadas para deploy no Render.com - Python 3.11
-# Instalação sequencial para evitar conflitos
+# BioAccess - Render.com Deploy (Python 3.11)
+# Versões testadas e estáveis
 
-# Build dependencies PRIMEIRO - corrige erro distutils  
-setuptools==69.5.1
-wheel==0.42.0
-
-# Core FastAPI
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-
-# Database
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 supabase==2.0.2
-
-# Authentication  
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
-
-# AI/ML - VERSÕES ESPECÍFICAS PARA RENDER
-# Instalar TensorFlow-CPU primeiro para evitar conflitos
 tensorflow-cpu==2.15.0
 numpy==1.24.3
 opencv-python-headless==4.8.1.78
 pillow==10.1.0
 deepface==0.0.79
-
-# Utilities
 python-dotenv==1.0.0
 pydantic==2.4.2

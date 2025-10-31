@@ -31,12 +31,9 @@ git push origin main
 - **New > Web Service**
 - Conecte seu repositório GitHub: `analuiza2102/BioAcess`
 
-**⚠️ IMPORTANTE - Build Command Corrigido:**
-- **Build Command:** `python install_render.py`  
+**✅ Configuração Simplificada:**
+- **Build Command:** `pip install -r requirements_render.txt`  
 - **Start Command:** `python render_start.py`
-
-**🔧 Alternativa se der erro:**
-- **Build Command:** `pip install -r requirements_minimal.txt`
 
 ### 3. **Configurar Variáveis de Ambiente:**
 No painel do Render, adicione:
