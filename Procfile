@@ -1,1 +1,1 @@
-web: python3 start.py
+web: cd src/backend && python3 run_server.py
