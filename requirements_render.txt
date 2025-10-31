@@ -1,3 +1,4 @@
+# Configurações otimizadas para deploy no Render.com
 # Core FastAPI
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -12,16 +13,17 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 
-# AI/ML optimized for Render
+# AI/ML - versões compatíveis com Python 3.11
 deepface==0.0.79
-tensorflow-cpu==2.15.0
+tensorflow==2.15.0
 opencv-python-headless==4.8.1.78
 numpy==1.24.3
 pillow==10.0.1
 
-# Fix for distutils
-setuptools==69.5.1
-
 # Utilities
 python-dotenv==1.0.0
 pydantic==2.4.2
+
+# Build dependencies - corrige erro distutils
+setuptools==69.5.1
+wheel==0.42.0

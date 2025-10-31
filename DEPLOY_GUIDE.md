@@ -1,23 +1,23 @@
-# Configurações de Produção para BioAccess
-# 
-# Para deploy em produção, você precisa configurar:
+# 🚀 Guia de Deploy - BioAccess
 
-## 1. VARIÁVEIS DE AMBIENTE
-# Crie um arquivo .env na raiz do backend com:
+## Problemas Resolvidos
 
-# Database (Supabase)
-SUPABASE_DB_URL=sua_url_do_supabase
-SUPABASE_KEY=sua_chave_do_supabase
+### ❌ Problemas Identificados:
+1. **Render**: Erro `ModuleNotFoundError: No module named 'distutils'`
+2. **Vercel**: Conflitos de configuração frontend/backend
+3. **Dependências**: Versões incompatíveis do TensorFlow
 
-# JWT Secret (gere uma chave segura)
-JWT_SECRET=uma_chave_muito_segura_e_aleatoria_de_pelo_menos_32_caracteres
+### ✅ Soluções Implementadas:
 
-# Configurações do servidor
-PORT=8001
-HOST=0.0.0.0
-ENVIRONMENT=production
+## 📦 Deploy no Render (Backend)
 
-# Configurações de CORS
+### 1. Configurações do Render:
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `python render_start.py`
+- **Environment**: Python 3.11
+- **Region**: Oregon (US West)
+
+### 2. Variáveis de Ambiente no Render:
 FRONTEND_URL=https://seu-app.vercel.app
 
 ## 2. BANCO DE DADOS

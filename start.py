@@ -1,31 +1,26 @@
 #!/usr/bin/env python3
 """
-Arquivo de inicialização para Railway
+Launcher para BioAccess no Railway
 """
 import os
 import sys
+import subprocess
 from pathlib import Path
 
-# Adicionar src/backend ao path
-backend_path = Path(__file__).parent / "src" / "backend"
-sys.path.insert(0, str(backend_path))
-
-# Importar e executar
-os.chdir(backend_path)
+def main():
+    # Mudar para o diretório backend
+    backend_dir = Path(__file__).parent / "src" / "backend"
+    os.chdir(backend_dir)
+    
+    print(f"🚀 Starting BioAccess from: {backend_dir}")
+    print(f"🐍 Python executable: {sys.executable}")
+    
+    # Executar o servidor
+    try:
+        subprocess.run([sys.executable, "run_server.py"], check=True)
+    except Exception as e:
+        print(f"❌ Error starting server: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    import uvicorn
-    
-    # Configuração para Railway
-    port = int(os.environ.get("PORT", 8001))
-    host = "0.0.0.0"
-    
-    print(f"🚀 Iniciando servidor na porta {port}")
-    
-    uvicorn.run(
-        "app.main:app",
-        host=host,
-        port=port,
-        reload=False,
-        log_level="info"
-    )
+    main()
