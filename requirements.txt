@@ -1,5 +1,5 @@
-# BioAccess - Desenvolvimento Local
-# Versões para Windows/desenvolvimento
+# BioAccess - Render.com Deploy (Python 3.11)
+# Versões testadas e estáveis
 
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
@@ -9,10 +9,10 @@ supabase==2.0.2
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
-tensorflow==2.20.2
-deepface==0.0.79
-opencv-python==4.8.1.78
+tensorflow-cpu==2.15.0
 numpy==1.24.3
+opencv-python-headless==4.8.1.78
 pillow==10.1.0
+deepface==0.0.79
 python-dotenv==1.0.0
 pydantic==2.4.2
