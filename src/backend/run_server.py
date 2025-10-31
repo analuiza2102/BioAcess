@@ -32,11 +32,15 @@ if __name__ == "__main__":
     print("🌐 API Docs: http://127.0.0.1:8001/docs")
     
     # Usar string import para permitir reload
+    # Configuração para produção (Railway) ou desenvolvimento
+    host = "0.0.0.0" if os.getenv("ENVIRONMENT") == "production" else "127.0.0.1"
+    reload = os.getenv("ENVIRONMENT") != "production"
+    
     uvicorn.run(
         "app.main:app",
-        host="127.0.0.1",
-        port=8001,
-        reload=True,
-        reload_dirs=[str(backend_dir)],
+        host=host,
+        port=int(os.getenv("PORT", 8001)),
+        reload=reload,
+        reload_dirs=[str(backend_dir)] if reload else None,
         log_level="info"
     )
