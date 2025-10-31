@@ -1,7 +1,6 @@
 services:
   - type: web
     name: bioaccess-api
-    env: python
     runtime: python
     plan: starter
     buildCommand: pip install -r requirements_render.txt
