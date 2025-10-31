@@ -12,7 +12,7 @@ import type {
 
 import { mockAPI, USE_MOCK_API } from './mockAPI';
 
-const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:8001';
+const API_BASE = import.meta.env?.VITE_API_URL || import.meta.env?.VITE_API_BASE || 'http://localhost:8001';
 
 class APIError extends Error {
   constructor(public status: number, message: string) {
