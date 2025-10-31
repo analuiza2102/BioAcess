@@ -20,9 +20,31 @@
 
 > 💡 **Nota**: Projeto desenvolvido para fins educacionais e demonstração de competências técnicas  
 
+## 🚀 **Setup Rápido**
+
+### **Windows - Setup Automático:**
+```powershell
+# 1. Clone o repositório
+git clone https://github.com/analuiza2102/BioAcess.git
+cd BioAcess
+
+# 2. Execute o setup automático
+.\setup.ps1
+```
+
+### **Execução do Sistema:**
+```powershell
+# Terminal 1 - Backend
+.\venv\Scripts\Activate.ps1
+python src/backend/run_server.py
+
+# Terminal 2 - Frontend  
+npm run dev
+```
+
 ## ✨ Funcionalidades Implementadas
 
-- ✅ **Autenticação Biométrica Completa**: DeepFace + FaceNet512 para reconhecimento facial
+- ✅ **Autenticação Biométrica Completa**: DeepFace + TensorFlow 2.20.0 para reconhecimento facial
 - ✅ **Controle de Acesso Multinível**: 3 níveis de clearance (Público, Diretor, Ministro)  
 - ✅ **Interface Moderna**: React + TypeScript + Tailwind CSS com Glass Morphism
 - ✅ **API RESTful Funcional**: FastAPI com endpoints completos e documentação

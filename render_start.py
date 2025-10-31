@@ -24,6 +24,9 @@ def main():
     os.environ.setdefault("HOST", "0.0.0.0")
     os.environ.setdefault("PORT", str(os.getenv("PORT", "10000")))
     
+    # Adicionar o diretório backend ao Python path
+    sys.path.insert(0, str(backend_dir))
+    
     # Executar servidor
     try:
         import uvicorn
