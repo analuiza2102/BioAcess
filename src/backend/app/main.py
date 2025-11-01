@@ -16,28 +16,23 @@ app = FastAPI(
 # Configuração CORS para permitir frontend
 import os
 
-# Domínios permitidos (desenvolvimento + produção)
-allowed_origins = [
-    "http://localhost:3003",
-    "http://localhost:3002", 
-    "http://localhost:3001",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3003",
-    "http://127.0.0.1:3002",
-    "http://127.0.0.1:3001", 
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173"
-]
 
-# Adicionar domínio de produção se especificado
-frontend_url = os.getenv('FRONTEND_URL')
-if frontend_url:
-    allowed_origins.append(frontend_url)
-
-# Permitir todos os domínios .vercel.app em produção
-if os.getenv('NODE_ENV') == 'production':
-    allowed_origins.append("https://*.vercel.app")
+# Lê CORS_ORIGINS do ambiente (JSON ou CSV)
+import json
+cors_env = os.getenv("CORS_ORIGINS")
+if cors_env:
+    try:
+        allowed_origins = json.loads(cors_env)
+    except Exception:
+        allowed_origins = [o.strip() for o in cors_env.split(",") if o.strip()]
+else:
+    allowed_origins = [
+        "http://localhost:3003",
+        "http://localhost:3002", 
+        "http://localhost:3001",
+        "http://localhost:3000",
+        "http://localhost:5173"
+    ]
 
 app.add_middleware(
     CORSMiddleware,
