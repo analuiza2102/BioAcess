@@ -40,7 +40,7 @@ export function Login() {
           clearance: data.clearance as 1 | 2 | 3
         });
       } else {
-        const response = await fetch(`${import.meta.env?.VITE_API_BASE || 'http://localhost:8001'}/auth/login`, {
+  const response = await fetch(`${import.meta.env?.VITE_API_URL || import.meta.env?.VITE_API_BASE || 'http://localhost:8001'}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
