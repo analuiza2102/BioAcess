@@ -40,22 +40,12 @@ export function Login() {
           clearance: data.clearance as 1 | 2 | 3
         });
       } else {
-  const response = await fetch(`${import.meta.env?.VITE_API_URL || import.meta.env?.VITE_API_BASE || 'http://localhost:8001'}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.detail || 'Credenciais inválidas');
-        }
-
-        const data = await response.json();
-        login(data.access_token, {
+        const data = await api.login(username, password);
+        const token = data.access_token || data.token || '';
+        login(token, {
           username: data.username || username,
-          role: data.role,
-          clearance: data.clearance
+          role: data.role as 'public' | 'director' | 'minister',
+          clearance: data.clearance as 1 | 2 | 3
         });
       }
 
@@ -100,7 +90,8 @@ export function Login() {
         ? await mockAPI.login(username, 'password')
         : await api.verifyImageUpload(username, selectedImage);
 
-      login(response.access_token || response.token, {
+      const token = ('access_token' in response ? response.access_token : response.token) || '';
+      login(token, {
         username: response.username || username,
         role: response.role as 'public' | 'director' | 'minister',
         clearance: response.clearance as 1 | 2 | 3
@@ -137,14 +128,14 @@ export function Login() {
       }
 
       console.log('✅ Resposta da API recebida:', {
-        access_token: response.access_token ? `${response.access_token.substring(0, 20)}...` : 'null',
-        token: response.token ? `${response.token.substring(0, 20)}...` : 'null',
+        token: ('access_token' in response ? response.access_token : response.token) || 'null',
         role: response.role,
         clearance: response.clearance,
         username: response.username
       });
 
-      login(response.access_token || response.token, {
+      const token = ('access_token' in response ? response.access_token : response.token) || '';
+      login(token, {
         username: response.username || username,
         role: response.role as 'public' | 'director' | 'minister',
         clearance: response.clearance as 1 | 2 | 3
