@@ -17,7 +17,12 @@ const API_BASE = import.meta.env?.VITE_API_URL
   || import.meta.env?.VITE_API_BASE 
   || (window.location.hostname.includes('vercel.app') ? 'https://bioacess.onrender.com' : 'http://localhost:8001');
 
-console.log('🌐 API_BASE configurada:', API_BASE);
+console.log('🔍 Debug Environment Variables:', {
+  VITE_API_URL: import.meta.env?.VITE_API_URL,
+  VITE_API_BASE: import.meta.env?.VITE_API_BASE,
+  hostname: window.location.hostname,
+  API_BASE: API_BASE
+});
 
 class APIError extends Error {
   constructor(public status: number, message: string) {
