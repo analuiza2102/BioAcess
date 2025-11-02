@@ -25,6 +25,6 @@
   "devCommand": "npm run dev",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://bioaccess.onrender.com"
+    "VITE_API_URL": "https://bioacess.onrender.com"
   }
 }
