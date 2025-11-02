@@ -27,6 +27,15 @@ def main():
     # Adicionar o diretório backend ao Python path
     sys.path.insert(0, str(backend_dir))
     
+    # Inicializar banco de dados
+    try:
+        print("🗄️  Inicializando banco de dados...")
+        from app.db import Base, engine
+        Base.metadata.create_all(bind=engine)
+        print("✅ Banco de dados inicializado!")
+    except Exception as e:
+        print(f"⚠️  Aviso ao inicializar BD: {e}")
+    
     # Executar servidor
     try:
         import uvicorn
