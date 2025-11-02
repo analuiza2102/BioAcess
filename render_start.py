@@ -15,7 +15,10 @@ def main():
     if not backend_dir.exists():
         print("❌ Backend directory not found")
         sys.exit(1)
-        
+    
+    # Adicionar o diretório backend ao Python path ANTES de mudar o diretório
+    sys.path.insert(0, str(backend_dir))
+    
     os.chdir(backend_dir)
     print(f"📁 Working directory: {backend_dir}")
     print(f"🐍 Python executable: {sys.executable}")
@@ -24,15 +27,12 @@ def main():
     os.environ.setdefault("HOST", "0.0.0.0")
     os.environ.setdefault("PORT", str(os.getenv("PORT", "10000")))
     
-    # Adicionar o diretório backend ao Python path
-    sys.path.insert(0, str(backend_dir))
-    
     # Inicializar banco de dados
     try:
         print("🗄️  Inicializando banco de dados...")
-        from app.db import Base, engine, SessionLocal
-        from app.models import User
-        from app.security import pwd_context
+        from app.config import Base, engine, SessionLocal
+        from app.models.user import User
+        from app.routers.auth import pwd_context
         
         # Criar tabelas
         print("📋 Criando tabelas no banco de dados...")
