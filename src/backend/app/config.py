@@ -1,19 +1,21 @@
 """Configurações e variáveis de ambiente do BioAccess"""
 
 from pydantic_settings import BaseSettings
+from typing import Optional
 
 
 class Settings(BaseSettings):
-    # Database
-    SUPABASE_DB_URL: str
+    # Database (opcional - usa SQLite se não fornecido)
+    SUPABASE_DB_URL: Optional[str] = None
+    DATABASE_URL: Optional[str] = None  # Alias para compatibilidade Render
     
-    # JWT
-    JWT_SECRET: str
+    # JWT (com defaults seguros para desenvolvimento)
+    JWT_SECRET: str = "default-secret-change-in-production-a1b2c3d4e5f6"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 30
     
     # CORS
-    CORS_ORIGINS: str = "http://localhost:3003,http://localhost:3002,http://localhost:3000,http://localhost:3001,http://localhost:5173"
+    CORS_ORIGINS: str = "http://localhost:3003,http://localhost:3002,http://localhost:3000,http://localhost:3001,http://localhost:5173,https://bio-acess.vercel.app"
     
     # Biometria
     EMBEDDING_MODEL: str = "Facenet"  # Facenet, VGG-Face, OpenFace
@@ -28,6 +30,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        extra = "ignore"  # Ignora variáveis extras do ambiente
         env_file_encoding = "utf-8"
 
 

@@ -1,9 +1,16 @@
 """Aplicação principal FastAPI do BioAccess"""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from .config import settings
 from .routers import auth, data, reports
+import logging
+import traceback
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("bioaccess")
 
 app = FastAPI(
     title="BioAccess API",
@@ -36,10 +43,24 @@ allowed_origins = list(dict.fromkeys([*default_origins, *env_origins]))
 
 print(f"🌐 CORS Origins configuradas: {allowed_origins}")
 
+# Handler global de exceções
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """Captura todas as exceções não tratadas e loga adequadamente"""
+    logger.exception(f"Unhandled error on {request.method} {request.url}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error",
+            "error": str(exc),
+            "path": str(request.url)
+        }
+    )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app$",  # Aceita todos os subdomínios do Vercel
+    allow_origin_regex=r"^https://.*\.vercel\.app$",  # Aceita todos os subdomínios do Vercel
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -35,14 +35,19 @@ def main():
         from app.security import pwd_context
         
         # Criar tabelas
+        print("📋 Criando tabelas no banco de dados...")
         Base.metadata.create_all(bind=engine)
-        print("✅ Tabelas criadas!")
+        print("✅ Tabelas criadas com sucesso!")
         
-        # Criar usuários padrão se não existirem
+        # Verificar conexão
         db = SessionLocal()
         try:
-            existing_user = db.query(User).first()
-            if not existing_user:
+            # Testar query simples
+            user_count = db.query(User).count()
+            print(f"✅ Conexão com banco OK - {user_count} usuários existentes")
+            
+            # Criar usuários padrão se não existirem
+            if user_count == 0:
                 print("👤 Criando usuários padrão...")
                 default_users = [
                     User(username="ana.luiza", password_hash=pwd_context.hash("senha123"), role="public", clearance=1),
@@ -56,14 +61,22 @@ def main():
                 print(f"✅ {len(default_users)} usuários criados!")
             else:
                 print("✅ Usuários já existem no banco!")
+        except Exception as e:
+            print(f"❌ Erro ao verificar/criar usuários: {e}")
+            import traceback
+            traceback.print_exc()
+            db.rollback()
+            raise
         finally:
             db.close()
             
         print("✅ Banco de dados inicializado!")
     except Exception as e:
-        print(f"⚠️  Aviso ao inicializar BD: {e}")
+        print(f"❌ ERRO FATAL ao inicializar banco de dados: {e}")
         import traceback
         traceback.print_exc()
+        print("⚠️  Servidor NÃO será iniciado devido a erro no banco de dados")
+        sys.exit(1)
     
     # Executar servidor
     try:
@@ -78,6 +91,9 @@ def main():
         )
     except Exception as e:
         print(f"❌ Error starting server: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
         sys.exit(1)
 
 if __name__ == "__main__":
