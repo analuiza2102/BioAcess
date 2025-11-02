@@ -15,7 +15,7 @@ import { mockAPI, USE_MOCK_API } from './mockAPI';
 // URL da API com fallback para produção
 const API_BASE = import.meta.env?.VITE_API_URL 
   || import.meta.env?.VITE_API_BASE 
-  || (window.location.hostname.includes('vercel.app') ? 'https://bioacess.onrender.com' : 'http://localhost:8001');
+  || (window.location.hostname.includes('vercel.app') ? '/api' : 'http://localhost:8001');
 
 console.log('🔍 Debug Environment Variables:', {
   VITE_API_URL: import.meta.env?.VITE_API_URL,
