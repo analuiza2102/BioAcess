@@ -30,11 +30,40 @@ def main():
     # Inicializar banco de dados
     try:
         print("🗄️  Inicializando banco de dados...")
-        from app.db import Base, engine
+        from app.db import Base, engine, SessionLocal
+        from app.models import User
+        from app.security import pwd_context
+        
+        # Criar tabelas
         Base.metadata.create_all(bind=engine)
+        print("✅ Tabelas criadas!")
+        
+        # Criar usuários padrão se não existirem
+        db = SessionLocal()
+        try:
+            existing_user = db.query(User).first()
+            if not existing_user:
+                print("👤 Criando usuários padrão...")
+                default_users = [
+                    User(username="ana.luiza", password_hash=pwd_context.hash("senha123"), role="public", clearance=1),
+                    User(username="teste1", password_hash=pwd_context.hash("teste123"), role="public", clearance=1),
+                    User(username="diretor.silva", password_hash=pwd_context.hash("diretor2024"), role="director", clearance=2),
+                    User(username="ministro.ambiente", password_hash=pwd_context.hash("ministro2024"), role="minister", clearance=3),
+                ]
+                for user in default_users:
+                    db.add(user)
+                db.commit()
+                print(f"✅ {len(default_users)} usuários criados!")
+            else:
+                print("✅ Usuários já existem no banco!")
+        finally:
+            db.close()
+            
         print("✅ Banco de dados inicializado!")
     except Exception as e:
         print(f"⚠️  Aviso ao inicializar BD: {e}")
+        import traceback
+        traceback.print_exc()
     
     # Executar servidor
     try:
