@@ -1,20 +1,5 @@
 {
-  "version": 2,
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://bioacess.onrender.com/$1"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
-      ]
-    }
+    { "source": "/api/(.*)", "destination": "https://bioacess.onrender.com/$1" }
   ]
 }
