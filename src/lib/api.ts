@@ -12,7 +12,12 @@ import type {
 
 import { mockAPI, USE_MOCK_API } from './mockAPI';
 
-const API_BASE = import.meta.env?.VITE_API_URL || import.meta.env?.VITE_API_BASE || 'http://localhost:8001';
+// URL da API com fallback para produção
+const API_BASE = import.meta.env?.VITE_API_URL 
+  || import.meta.env?.VITE_API_BASE 
+  || (window.location.hostname.includes('vercel.app') ? 'https://bioacess.onrender.com' : 'http://localhost:8001');
+
+console.log('🌐 API_BASE configurada:', API_BASE);
 
 class APIError extends Error {
   constructor(public status: number, message: string) {
