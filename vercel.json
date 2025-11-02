@@ -5,6 +5,9 @@
       "destination": "https://bioacess.onrender.com/:path*"
     }
   ],
+  "buildCommand": "npm install && npm run build",
+  "installCommand": "npm install",
+  "framework": "vite",
   "env": {
     "VITE_API_URL": "/api"
   }
