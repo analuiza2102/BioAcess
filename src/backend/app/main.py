@@ -23,17 +23,21 @@ app = FastAPI(
 # Configuração CORS para permitir frontend
 import os
 import json
+import re
 
-# Lê CORS_ORIGINS do ambiente (JSON ou CSV)
+# Lê CORS_ORIGINS do ambiente
 cors_env = os.getenv("CORS_ORIGINS", "")
-env_origins = [o.strip() for o in cors_env.split(",") if o.strip()] if cors_env else []
 
-# Origens padrão para desenvolvimento e produção
+# Parse do CORS_ORIGINS (suporta CSV, JSON, ou lista mista)
+env_origins = []
+if cors_env:
+    # Remove caracteres JSON extras se existirem
+    cors_env_clean = re.sub(r'[\[\]"\']', '', cors_env)
+    # Faz split por vírgula e limpa espaços
+    env_origins = [o.strip() for o in cors_env_clean.split(",") if o.strip() and o.strip().startswith("http")]
+
+# Origens padrão para desenvolvimento
 default_origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3002",
-    "http://localhost:3003",
     "http://localhost:5173",
     "https://bio-acess.vercel.app",
 ]
@@ -42,6 +46,7 @@ default_origins = [
 allowed_origins = list(dict.fromkeys([*default_origins, *env_origins]))
 
 print(f"🌐 CORS Origins configuradas: {allowed_origins}")
+print(f"🔍 CORS_ORIGINS raw do ambiente: {cors_env}")
 
 # Handler global de exceções
 @app.exception_handler(Exception)
