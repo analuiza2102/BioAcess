@@ -3,7 +3,7 @@ services:
     name: bioaccess-api
     runtime: python
     plan: starter
-    buildCommand: pip install -r requirements_render.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: python render_start.py
     envVars:
       - key: PYTHON_VERSION
