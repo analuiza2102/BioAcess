@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://bioacess.onrender.com/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

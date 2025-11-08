@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Render.com launcher para BioAccess
+Railway deployment launcher para BioAccess
+Suporta TensorFlow e DeepFace para reconhecimento facial
 """
 import os
 import sys
-import subprocess
 from pathlib import Path
 
 def main():
-    print("🚀 Starting BioAccess on Render.com")
+    print("🚀 Starting BioAccess on Railway")
     
     # Mudar para o diretório backend
     backend_dir = Path(__file__).parent / "src" / "backend"
@@ -21,11 +21,11 @@ def main():
     
     os.chdir(backend_dir)
     print(f"📁 Working directory: {backend_dir}")
-    print(f"🐍 Python executable: {sys.executable}")
+    print(f"🐍 Python version: {sys.version}")
     
-    # Configuração para Render
+    # Configuração para Railway/Cloud
     os.environ.setdefault("HOST", "0.0.0.0")
-    os.environ.setdefault("PORT", str(os.getenv("PORT", "10000")))
+    os.environ.setdefault("PORT", str(os.getenv("PORT", "8000")))
     
     # Inicializar banco de dados
     try:
@@ -35,18 +35,16 @@ def main():
         from app.routers.auth import pwd_context
         
         # Criar tabelas
-        print("📋 Criando tabelas no banco de dados...")
+        print("📋 Criando tabelas...")
         Base.metadata.create_all(bind=engine)
-        print("✅ Tabelas criadas com sucesso!")
+        print("✅ Tabelas criadas!")
         
-        # Verificar conexão
+        # Verificar e criar usuários padrão
         db = SessionLocal()
         try:
-            # Testar query simples
             user_count = db.query(User).count()
-            print(f"✅ Conexão com banco OK - {user_count} usuários existentes")
+            print(f"✅ Conexão OK - {user_count} usuários")
             
-            # Criar usuários padrão se não existirem
             if user_count == 0:
                 print("👤 Criando usuários padrão...")
                 default_users = [
@@ -59,42 +57,36 @@ def main():
                     db.add(user)
                 db.commit()
                 print(f"✅ {len(default_users)} usuários criados!")
-            else:
-                print("✅ Usuários já existem no banco!")
         except Exception as e:
-            print(f"❌ Erro ao verificar/criar usuários: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"❌ Erro DB: {e}")
             db.rollback()
             raise
         finally:
             db.close()
             
-        print("✅ Banco de dados inicializado!")
+        print("✅ Banco inicializado!")
     except Exception as e:
-        print(f"❌ ERRO FATAL ao inicializar banco de dados: {e}")
-        import traceback
-        traceback.print_exc()
-        print("⚠️  Servidor NÃO será iniciado devido a erro no banco de dados")
+        print(f"❌ ERRO FATAL: {e}")
         sys.exit(1)
     
     # Executar servidor
     try:
         import uvicorn
         print("🌟 Starting uvicorn server...")
+        
+        # Configurações para Railway (com TensorFlow/DeepFace)
         uvicorn.run(
             "app.main:app",
             host="0.0.0.0",
-            port=int(os.getenv("PORT", 10000)),
+            port=int(os.getenv("PORT", 8000)),
             reload=False,
-            log_level="info"
+            log_level="info",
+            workers=1,
         )
     except Exception as e:
-        print(f"❌ Error starting server: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        print(f"❌ Error: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
+    main()
     main()

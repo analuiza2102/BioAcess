@@ -108,7 +108,7 @@ Sistema de **identificação e autenticação biométrica** para controle de ace
 - **Autenticação**: JWT tokens com refresh automático
 - **Detecção de Liveness**: Análise de múltiplas capturas com cosine similarity
 - **Segurança**: CORS configurado, validação Pydantic, logs de auditoria
-- **Deploy**: Dockerfile + Railway/Render ready
+- **Deploy**: Railway.app com suporte completo a TensorFlow
 
 ### 🛢️ Banco de Dados (Supabase PostgreSQL)
 - **Users**: Tabela de usuários com clearance levels

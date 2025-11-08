@@ -1,6 +1,6 @@
-# BioAccess Backend (fixed)
+# BioAccess Backend
 
-Backend FastAPI com CORS configurado corretamente e endpoint de login por JSON.
+Backend FastAPI com reconhecimento facial usando TensorFlow e DeepFace.
 
 ## Como rodar localmente
 
@@ -12,40 +12,45 @@ python -m venv .venv
 # source .venv/bin/activate
 pip install -r requirements.txt
 
-# variáveis (opcional)
-export JWT_SECRET_KEY="troque-isto"
-export DATABASE_URL="sqlite:///./bioaccess.db"
-export CORS_ORIGINS='["http://localhost:5173","https://bio-acess.vercel.app"]'
+# Variáveis de ambiente necessárias
+# Criar arquivo .env na raiz do projeto com:
+SUPABASE_DB_URL=postgresql://...
+SUPABASE_URL=https://...
+SUPABASE_KEY=eyJ...
+JWT_SECRET=sua-chave-secreta
+CORS_ORIGINS=http://localhost:5173,https://bio-acess.vercel.app
 
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Iniciar servidor
+python start.py
 ```
 
 Acesse: http://localhost:8000/docs
 
 ## Teste rápido
 
-Um usuário demo é criado automaticamente (apenas se não existir):
-- username: `ana.luiza`
-- senha: `admin123`
+Usuários demo são criados automaticamente:
+- username: `ana.luiza` / senha: `senha123`
+- username: `teste1` / senha: `teste123`
+- username: `diretor.silva` / senha: `diretor2024` (clearance 2)
+- username: `ministro.ambiente` / senha: `ministro2024` (clearance 3)
 
 ```bash
-curl -X POST http://localhost:8000/auth/login   -H "Content-Type: application/json"   -d '{"username":"ana.luiza","password":"admin123"}'
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"ana.luiza","password":"senha123"}'
 ```
 
-## Deploy (Render)
+## Deploy (Railway)
 
-- Start Command:
-  ```
-  gunicorn -w 2 -k uvicorn.workers.UvicornWorker app.main:app
-  ```
+Veja o guia completo: `RAILWAY_DEPLOY.md` na raiz do projeto.
 
-- Environment:
-  ```
-  JWT_SECRET_KEY=<sua chave segura>
-  DATABASE_URL=<postgres ou sqlite>
-  CORS_ORIGINS=["https://bio-acess.vercel.app","http://localhost:5173"]
-  ```
+**Quick Start**:
+1. Conecte repositório no Railway
+2. Configure variáveis de ambiente
+3. Deploy automático!
 
 ## Observações
-- O endpoint `/auth/login` aceita **JSON**.
+- Reconhecimento facial usa DeepFace local
+- TensorFlow requer 2GB+ RAM
+- Suporte a microserviço externo opcional via `FACIAL_RECOGNITION_SERVICE_URL`
 - Se preferir `form-data` (OAuth2), ajuste o `auth.py` conforme necessidade.
