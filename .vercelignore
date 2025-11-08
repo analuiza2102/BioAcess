@@ -1,11 +1,11 @@
 # Ignorar backend Python no deploy do Vercel
 src/backend/
 requirements.txt
-requirements_render.txt
 runtime.txt
 Procfile
-render.yaml
-render_start.py
+railway.json
+nixpacks.toml
+start.py
 *.py
 __pycache__/
 *.pyc
