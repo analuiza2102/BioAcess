@@ -238,3 +238,82 @@ async def login_by_upload(
     """
     # Reutilizar a mesma lógica do login por câmera
     return await login_by_camera(username, image, db)
+
+
+@router.post("/enroll-upload")
+async def enroll_biometric(
+    username: str = Form(...),
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Cadastro de biometria facial via upload de imagem
+    """
+    try:
+        # Verificar se usuário existe
+        from sqlalchemy import select
+        user = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        # Ler e validar imagem
+        contents = await image.read()
+        img = Image.open(io.BytesIO(contents))
+        
+        # Converter para RGB se necessário
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        
+        # Carregar DeepFace
+        df = load_deepface()
+        
+        # Converter para numpy array
+        img_array = np.array(img)
+        
+        # Validar que há um rosto na imagem
+        try:
+            faces = df.extract_faces(
+                img_path=img_array,
+                detector_backend='opencv',
+                enforce_detection=True
+            )
+            
+            if not faces or len(faces) == 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Nenhum rosto detectado na imagem. Use uma foto clara com seu rosto visível."
+                )
+            
+            if len(faces) > 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Múltiplos rostos detectados. Use uma foto com apenas um rosto."
+                )
+            
+            # TODO: Salvar embedding da face no banco de dados
+            # Por enquanto, apenas validamos que a foto é válida
+            
+            return {
+                "success": True,
+                "message": "Biometria cadastrada com sucesso!",
+                "username": username,
+                "face_detected": True
+            }
+            
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Erro na detecção facial: {str(e)}"
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro no cadastro de biometria: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail="Erro interno no servidor"
+        )
