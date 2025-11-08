@@ -12,6 +12,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useAuthContext } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { api, APIError } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -25,6 +26,7 @@ import type { AuditLog, AuditParams } from '../types';
 
 export function Reports() {
   const { user, token, logout } = useAuthContext();
+  const { theme } = useTheme();
   const navigate = useNavigate();
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,9 +136,22 @@ export function Reports() {
   const totalPages = Math.ceil(total / (filters.limit || 10));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
+    <div 
+      className="min-h-screen"
+      style={{
+        background: theme === 'light'
+          ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+          : 'linear-gradient(135deg, #111827 0%, #1f2937 100%)'
+      }}
+    >
       {/* Header */}
-      <header className="bg-white dark:bg-gray-950 border-b shadow-sm">
+      <header 
+        className="border-b shadow-sm"
+        style={{
+          backgroundColor: theme === 'light' ? '#ffffff' : '#030712',
+          borderColor: theme === 'light' ? '#e5e7eb' : '#374151'
+        }}
+      >
         <div className="container mx-auto px-4 py-4">
           <Button
             variant="ghost"
@@ -149,13 +164,31 @@ export function Reports() {
           
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl mb-1">Relatórios de Auditoria</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 
+                className="text-2xl mb-1"
+                style={{ color: theme === 'light' ? '#111827' : '#f9fafb' }}
+              >
+                Relatórios de Auditoria
+              </h1>
+              <p 
+                className="text-sm"
+                style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
+              >
                 Visualize e exporte logs de acesso ao sistema
               </p>
             </div>
             
-            <Button onClick={handleExportCSV} disabled={logs.length === 0}>
+            <Button 
+              onClick={handleExportCSV} 
+              disabled={logs.length === 0}
+              style={{
+                background: theme === 'light' 
+                  ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
+                  : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                color: '#ffffff',
+                border: 'none'
+              }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Exportar CSV
             </Button>
