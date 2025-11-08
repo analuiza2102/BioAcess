@@ -1,5 +1,8 @@
 [phases.setup]
 nixPkgs = ["python311", "libGL", "libGLU"]
 
+[phases.install]
+dependsOn = []
+
 [start]
 cmd = "python start.py"
