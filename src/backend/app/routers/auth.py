@@ -64,7 +64,7 @@ def login_user(body: LoginRequest, db: Session = Depends(get_db)):
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
 
-        if not pwd_context.verify(body.password, user.password):
+        if not pwd_context.verify(body.password, user.password_hash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Senha incorreta")
 
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

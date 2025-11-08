@@ -5,6 +5,22 @@ from pathlib import Path
 def main():
     print("🚀 Starting BioAccess on Railway")
     
+    # Carregar variáveis de ambiente do .env.local (desenvolvimento local)
+    env_local = Path(__file__).parent / ".env.local"
+    if env_local.exists():
+        print(f"📝 Loading environment from: {env_local}")
+        with open(env_local, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+    
+    # Configurar DATABASE_URL a partir do SUPABASE_DB_URL
+    if os.getenv("SUPABASE_DB_URL"):
+        os.environ["DATABASE_URL"] = os.getenv("SUPABASE_DB_URL")
+        print(f"🗄️  Using PostgreSQL database from Railway")
+    
     # Mudar para o diretório backend
     backend_dir = Path(__file__).parent / "src" / "backend"
     if not backend_dir.exists():
@@ -43,10 +59,10 @@ def main():
             if user_count == 0:
                 print("👤 Criando usuários padrão...")
                 default_users = [
-                    User(username="ana.luiza", password=pwd_context.hash("senha123"), role="public", clearance=1),
-                    User(username="teste1", password=pwd_context.hash("teste123"), role="public", clearance=1),
-                    User(username="demo", password=pwd_context.hash("demo123"), role="director", clearance=2),
-                    User(username="admin", password=pwd_context.hash("admin123"), role="minister", clearance=3),
+                    User(username="ana.luiza", password_hash=pwd_context.hash("senha123"), role="public", clearance=1),
+                    User(username="teste1", password_hash=pwd_context.hash("teste123"), role="public", clearance=1),
+                    User(username="demo", password_hash=pwd_context.hash("demo123"), role="director", clearance=2),
+                    User(username="admin", password_hash=pwd_context.hash("admin123"), role="minister", clearance=3),
                 ]
                 for user in default_users:
                     db.add(user)
