@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Upload, FileImage, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface ImageUploadProps {
   onImageSelect: (file: File) => void;
@@ -22,6 +23,7 @@ export function ImageUpload({
   maxSizeMB = 5,
   showPreview = true
 }: ImageUploadProps) {
+  const { theme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -84,29 +86,62 @@ export function ImageUpload({
 
       {/* Área de upload */}
       {!selectedFile && (
-        <Card className="border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors">
+        <Card 
+          className="border-2 border-dashed transition-colors"
+          style={{
+            borderColor: theme === 'light' ? '#d1d5db' : '#4b5563',
+            backgroundColor: theme === 'light' ? '#ffffff' : '#1f2937'
+          }}
+        >
           <div 
             className="p-8 text-center cursor-pointer"
             onClick={triggerFileSelect}
           >
             <div className="flex flex-col items-center space-y-4">
-              <div className="p-3 bg-blue-50 rounded-full">
-                <Upload className="w-8 h-8 text-blue-500" />
+              <div 
+                className="p-3 rounded-full"
+                style={{
+                  backgroundColor: theme === 'light' ? '#dbeafe' : '#1e3a8a'
+                }}
+              >
+                <Upload 
+                  className="w-8 h-8"
+                  style={{ color: theme === 'light' ? '#3b82f6' : '#60a5fa' }}
+                />
               </div>
               
               <div className="space-y-2">
-                <h3 className="font-medium text-gray-900">
+                <h3 
+                  className="font-medium"
+                  style={{ color: theme === 'light' ? '#111827' : '#f9fafb' }}
+                >
                   Selecione uma imagem
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p 
+                  className="text-sm"
+                  style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
+                >
                   PNG, JPEG ou JPG até {maxSizeMB}MB
                 </p>
-                <p className="text-xs text-gray-400">
+                <p 
+                  className="text-xs"
+                  style={{ color: theme === 'light' ? '#9ca3af' : '#6b7280' }}
+                >
                   ⚡ Recomenda-se usar imagens com fundo branco para melhor precisão
                 </p>
               </div>
               
-              <Button type="button" disabled={disabled}>
+              <Button 
+                type="button" 
+                disabled={disabled}
+                style={{
+                  background: theme === 'light' 
+                    ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
+                    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                  color: '#ffffff',
+                  border: 'none'
+                }}
+              >
                 <FileImage className="w-4 h-4 mr-2" />
                 {label}
               </Button>
@@ -117,7 +152,13 @@ export function ImageUpload({
 
       {/* Preview da imagem selecionada */}
       {selectedFile && showPreview && (
-        <Card className="p-4">
+        <Card 
+          className="p-4"
+          style={{
+            backgroundColor: theme === 'light' ? '#ffffff' : '#1f2937',
+            borderColor: theme === 'light' ? '#e5e7eb' : '#374151'
+          }}
+        >
           <div className="flex items-start space-x-4">
             <div className="flex-shrink-0">
               {previewUrl && (
@@ -125,6 +166,7 @@ export function ImageUpload({
                   src={previewUrl}
                   alt="Preview"
                   className="w-32 h-32 object-cover rounded-lg border"
+                  style={{ borderColor: theme === 'light' ? '#d1d5db' : '#4b5563' }}
                 />
               )}
             </div>
@@ -132,10 +174,16 @@ export function ImageUpload({
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p 
+                    className="text-sm font-medium truncate"
+                    style={{ color: theme === 'light' ? '#111827' : '#f9fafb' }}
+                  >
                     {selectedFile.name}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p 
+                    className="text-sm"
+                    style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
+                  >
                     {selectedFile.type} • {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                   <div className="flex items-center mt-1">
@@ -161,15 +209,30 @@ export function ImageUpload({
 
       {/* Informações sobre o arquivo sem preview */}
       {selectedFile && !showPreview && (
-        <Card className="p-3">
+        <Card 
+          className="p-3"
+          style={{
+            backgroundColor: theme === 'light' ? '#ffffff' : '#1f2937',
+            borderColor: theme === 'light' ? '#e5e7eb' : '#374151'
+          }}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <FileImage className="w-5 h-5 text-blue-500" />
+              <FileImage 
+                className="w-5 h-5"
+                style={{ color: theme === 'light' ? '#3b82f6' : '#60a5fa' }}
+              />
               <div>
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p 
+                  className="text-sm font-medium truncate"
+                  style={{ color: theme === 'light' ? '#111827' : '#f9fafb' }}
+                >
                   {selectedFile.name}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p 
+                  className="text-xs"
+                  style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
+                >
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
@@ -189,14 +252,28 @@ export function ImageUpload({
 
       {/* Mensagem de erro */}
       {error && (
-        <div className="flex items-center space-x-2 p-3 bg-red-50 border border-red-200 rounded-md">
+        <div 
+          className="flex items-center space-x-2 p-3 border rounded-md"
+          style={{
+            backgroundColor: theme === 'light' ? '#fef2f2' : '#7f1d1d',
+            borderColor: theme === 'light' ? '#fecaca' : '#991b1b'
+          }}
+        >
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-          <p className="text-sm text-red-700">{error}</p>
+          <p 
+            className="text-sm"
+            style={{ color: theme === 'light' ? '#b91c1c' : '#fca5a5' }}
+          >
+            {error}
+          </p>
         </div>
       )}
 
       {/* Dicas de uso */}
-      <div className="text-xs text-gray-500 space-y-1">
+      <div 
+        className="text-xs space-y-1"
+        style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
+      >
         <p><strong>💡 Dicas para melhor resultado:</strong></p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li>Use imagem com fundo branco ou claro</li>
