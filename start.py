@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Railway deployment launcher para BioAccess
-Suporta TensorFlow e DeepFace para reconhecimento facial
-"""
 import os
 import sys
 from pathlib import Path
@@ -88,5 +83,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
     main()
