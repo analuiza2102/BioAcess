@@ -177,9 +177,9 @@ export const api = {
     
     const formData = new FormData();
     formData.append('username', username);
-    formData.append('camera_image', cameraImage, 'camera_capture.jpg');
+    formData.append('image', cameraImage, 'camera_capture.jpg');
     
-    const response = await fetch(`${API_BASE}/auth/verify-camera`, {
+    const response = await fetch(`${API_BASE}/auth/login/camera`, {
       method: 'POST',
       body: formData
     });
@@ -266,7 +266,7 @@ export const api = {
     formData.append('username', username);
     formData.append('image', imageFile);
 
-    const response = await fetch(`${API_BASE}/auth/verify-upload`, {
+    const response = await fetch(`${API_BASE}/auth/login/upload`, {
       method: 'POST',
       body: formData
     });

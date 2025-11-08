@@ -190,7 +190,12 @@ export function Login() {
           ) : showImageUpload ? (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-white">Verificação Biométrica por Upload</h2>
+                <div>
+                  <h2 className="text-xl font-semibold text-white">Verificação Biométrica por Upload</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Usuário: <span className="font-medium text-gray-800 dark:text-white">{username}</span>
+                  </p>
+                </div>
                 <button
                   onClick={() => setShowImageUpload(false)}
                   disabled={loading}

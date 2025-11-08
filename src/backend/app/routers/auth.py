@@ -11,6 +11,7 @@ import numpy as np
 
 from app.config import get_db, Base, engine
 from app.models.user import User
+from app.models.biometric_template import BiometricTemplate
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -143,10 +144,17 @@ async def login_by_camera(
         # Carregar DeepFace
         df = load_deepface()
         
-        # Ler imagem
+        # Ler imagem e converter para RGB
         image_bytes = await image.read()
         img = Image.open(io.BytesIO(image_bytes))
+        
+        # Converter para RGB se necessário (remove canal alpha se existir)
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+            print(f"🔄 Imagem convertida de {img.mode} para RGB")
+        
         img_array = np.array(img)
+        print(f"📐 Shape da imagem: {img_array.shape}")
         
         # TODO: Implementar verificação real
         # Por enquanto, apenas verifica se há uma face detectada
@@ -160,9 +168,73 @@ async def login_by_camera(
                     detail="Nenhuma face detectada na imagem"
                 )
             
-            # TODO: Comparar com embedding salvo do usuário
-            # Por enquanto, se detectou uma face, aceita
-            print(f"✅ Face detectada para usuário {username}")
+            # Verificar se usuário tem biometria cadastrada
+            biometric = db.execute(
+                select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
+            ).scalar_one_or_none()
+            
+            if not biometric:
+                print(f"❌ Usuário {username} não possui biometria cadastrada")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Usuário não possui biometria cadastrada. Cadastre sua biometria primeiro."
+                )
+            
+            print(f"✅ Biometria encontrada para user_id={user.id}")
+            
+            # Gerar embedding da imagem capturada
+            print(f"🔐 Gerando embedding da imagem capturada...")
+            try:
+                current_embedding = df.represent(
+                    img_path=img_array,
+                    model_name='Facenet',
+                    enforce_detection=True,
+                    detector_backend='opencv'
+                )
+                print(f"✅ Embedding gerado com sucesso!")
+            except Exception as embed_error:
+                print(f"❌ Erro ao gerar embedding: {embed_error}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Erro ao processar imagem: {str(embed_error)}"
+                )
+            
+            # Comparar embeddings usando distância euclidiana
+            try:
+                saved_embedding = np.array(biometric.embedding)
+                current_embedding_array = np.array(current_embedding[0]['embedding'])
+                
+                print(f"🔢 Tamanho embedding salvo: {len(saved_embedding)}")
+                print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
+                print(f"🔢 Tipo embedding salvo: {type(biometric.embedding)}")
+                
+                distance = np.linalg.norm(saved_embedding - current_embedding_array)
+                threshold = 10.0  # Threshold do Facenet (ajustável)
+                
+                print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
+                
+                if distance > threshold:
+                    print(f"❌ Face não reconhecida. Distância muito alta: {distance:.2f}")
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail=f"Face não reconhecida. Distância: {distance:.2f}"
+                    )
+                
+                print(f"✅ Face reconhecida! Usuário: {username}")
+            except HTTPException:
+                raise
+            except Exception as comp_error:
+                print(f"❌ Erro na comparação: {comp_error}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Erro ao comparar biometria: {str(comp_error)}"
+                )
+            
+            print(f"✅ Face reconhecida! Usuário: {username}")
             
             # Gerar token
             expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -174,7 +246,7 @@ async def login_by_camera(
                 "username": user.username,
                 "role": user.role,
                 "clearance": user.clearance,
-                "confidence": 0.95,  # Mock - implementar cálculo real
+                "confidence": 1.0 - (distance / threshold),  # Confiança baseada na distância
                 "method": "local_deepface",
                 "faces_detected": len(faces)
             }
@@ -200,7 +272,7 @@ async def login_by_camera(
 @router.post("/check-biometric")
 async def check_biometric(body: dict, db: Session = Depends(get_db)):
     """
-    Verifica se um usuário tem biometria cadastrada
+    Verifica se um usuário tem biometria cadastrada na tabela biometric_templates
     """
     try:
         username = body.get("username")
@@ -213,11 +285,16 @@ async def check_biometric(body: dict, db: Session = Depends(get_db)):
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
         
-        # Por enquanto, sempre retorna False (biometria não implementada ainda)
-        # TODO: Implementar verificação real quando salvarmos embeddings
+        # Verificar se existe registro na tabela biometric_templates
+        biometric = db.execute(
+            select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
+        ).scalar_one_or_none()
+        
+        has_biometric = biometric is not None
+        
         return {
-            "has_biometric": False,
-            "message": "Biometria não cadastrada"
+            "has_biometric": has_biometric,
+            "message": "Biometria cadastrada" if has_biometric else "Biometria não cadastrada"
         }
     except HTTPException:
         raise
@@ -291,8 +368,35 @@ async def enroll_biometric(
                     detail="Múltiplos rostos detectados. Use uma foto com apenas um rosto."
                 )
             
-            # TODO: Salvar embedding da face no banco de dados
-            # Por enquanto, apenas validamos que a foto é válida
+            # Gerar embedding da face
+            print(f"🔐 Gerando embedding facial para {username}...")
+            embedding = df.represent(
+                img_path=img_array,
+                model_name='Facenet',
+                enforce_detection=True,
+                detector_backend='opencv'
+            )
+            
+            # Verificar se já existe biometria cadastrada
+            from sqlalchemy import select
+            existing_biometric = db.execute(
+                select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
+            ).scalar_one_or_none()
+            
+            if existing_biometric:
+                # Atualizar embedding existente
+                existing_biometric.embedding = embedding[0]['embedding']
+                print(f"🔄 Biometria atualizada para {username}")
+            else:
+                # Criar novo registro
+                new_biometric = BiometricTemplate(
+                    user_id=user.id,
+                    embedding=embedding[0]['embedding']
+                )
+                db.add(new_biometric)
+                print(f"✅ Biometria cadastrada para {username}")
+            
+            db.commit()
             
             return {
                 "success": True,

@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { Upload, FileImage, X, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -131,20 +130,23 @@ export function ImageUpload({
                 </p>
               </div>
               
-              <Button 
+              <button 
                 type="button" 
                 disabled={disabled}
+                className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   background: theme === 'light' 
                     ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
                     : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                   color: '#ffffff',
-                  border: 'none'
+                  border: 'none',
+                  padding: '0.5rem 1.5rem',
+                  cursor: disabled ? 'not-allowed' : 'pointer'
                 }}
               >
-                <FileImage className="w-4 h-4 mr-2" />
-                {label}
-              </Button>
+                <FileImage className="w-4 h-4" style={{ color: '#ffffff' }} />
+                <span style={{ color: '#ffffff', fontWeight: '500' }}>{label}</span>
+              </button>
             </div>
           </div>
         </Card>
@@ -192,15 +194,15 @@ export function ImageUpload({
                   </div>
                 </div>
                 
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={clearSelection}
                   disabled={disabled}
+                  className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                  style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
                 >
                   <X className="w-4 h-4" />
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -237,15 +239,15 @@ export function ImageUpload({
                 </p>
               </div>
             </div>
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
               onClick={clearSelection}
               disabled={disabled}
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+              style={{ color: theme === 'light' ? '#6b7280' : '#9ca3af' }}
             >
               <X className="w-4 h-4" />
-            </Button>
+            </button>
           </div>
         </Card>
       )}
