@@ -70,7 +70,13 @@ def login_user(body: LoginRequest, db: Session = Depends(get_db)):
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         token = jwt.encode({"sub": user.username, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
-        return {"access_token": token, "token_type": "bearer"}
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "username": user.username,
+            "role": user.role,
+            "clearance": user.clearance
+        }
     except HTTPException:
         raise
     except Exception as e:
@@ -156,6 +162,35 @@ async def login_by_camera(
             status_code=500,
             detail="Erro interno no servidor"
         )
+
+
+@router.post("/check-biometric")
+async def check_biometric(body: dict, db: Session = Depends(get_db)):
+    """
+    Verifica se um usuário tem biometria cadastrada
+    """
+    try:
+        username = body.get("username")
+        if not username:
+            raise HTTPException(status_code=400, detail="Username é obrigatório")
+        
+        from sqlalchemy import select
+        user = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        # Por enquanto, sempre retorna False (biometria não implementada ainda)
+        # TODO: Implementar verificação real quando salvarmos embeddings
+        return {
+            "has_biometric": False,
+            "message": "Biometria não cadastrada"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro ao verificar biometria: {e}")
+        raise HTTPException(status_code=500, detail="Erro interno")
 
 
 @router.post("/login/upload")

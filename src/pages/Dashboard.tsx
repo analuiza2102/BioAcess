@@ -161,22 +161,22 @@ export function Dashboard() {
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)'
       }}>
-        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{
               background: theme === 'light' 
                 ? 'linear-gradient(135deg, #16a34a, #15803d)' 
                 : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
             }}>
-              <ShieldCheck className="w-7 h-7 text-white" />
+              <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold" style={{
+              <h1 className="text-xl font-bold leading-tight" style={{
                 color: theme === 'light' ? '#059669' : '#10b981'
               }}>
                 BioAccess
               </h1>
-              <p className="text-sm font-medium" style={{
+              <p className="text-xs font-medium" style={{
                 color: theme === 'light' ? '#64748b' : '#94a3b8'
               }}>
                 🔐 Sistema de Autenticação Biométrica Facial
@@ -184,17 +184,7 @@ export function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            {user.clearance >= 3 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/reports')}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Relatórios
-              </Button>
-            )}
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
