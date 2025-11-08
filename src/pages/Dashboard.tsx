@@ -270,17 +270,23 @@ export function Dashboard() {
         }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+              <div className={`p-3 rounded-full ${
                 hasBiometric === true
-                  ? 'bg-green-100 dark:bg-green-800'
-                  : 'bg-orange-100 dark:bg-orange-800'
+                  ? (theme === 'light' ? 'bg-green-100' : 'bg-green-800')
+                  : (theme === 'light' ? 'bg-orange-100' : 'bg-orange-800')
               }`}>
                 {loadingBiometric ? (
                   <div className="animate-spin w-6 h-6 border-2 border-gray-600 border-t-transparent rounded-full" />
                 ) : hasBiometric === true ? (
-                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-300" />
+                  <CheckCircle 
+                    className="w-6 h-6"
+                    style={{ color: theme === 'light' ? '#16a34a' : '#86efac' }}
+                  />
                 ) : (
-                  <XCircle className="w-6 h-6 text-orange-600 dark:text-orange-300" />
+                  <XCircle 
+                    className="w-6 h-6"
+                    style={{ color: theme === 'light' ? '#ea580c' : '#fdba74' }}
+                  />
                 )}
               </div>
               <div>
@@ -318,9 +324,15 @@ export function Dashboard() {
                 onClick={() => {
                   navigate('/enroll');
                 }}
-                className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg"
+                className="text-white shadow-lg"
                 size="lg"
                 disabled={loadingBiometric}
+                style={{
+                  background: theme === 'light' 
+                    ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
+                    : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                  border: 'none'
+                }}
               >
                 <User className="w-4 h-4 mr-2" />
                 Cadastrar Biometria
