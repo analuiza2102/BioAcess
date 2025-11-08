@@ -1,11 +1,5 @@
 [phases.setup]
-nixPkgs = ["python311", "python311Packages.pip", "libGL"]
-
-[phases.install]
-cmds = [
-  "python -m pip install --upgrade pip setuptools wheel",
-  "python -m pip install -r requirements.txt"
-]
+nixPkgs = ["libGL", "libGLU"]
 
 [start]
 cmd = "python start.py"
