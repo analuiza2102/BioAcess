@@ -19,10 +19,10 @@ python-multipart==0.0.6
 python-dotenv==1.0.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
-httpx==0.25.2
 
-# Supabase
+# Supabase (httpx version must be compatible)
 supabase==2.0.2
+httpx>=0.24.0,<0.25.0
 
 # Image processing & AI/ML para reconhecimento facial
 pillow==10.1.0
