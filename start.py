@@ -43,10 +43,10 @@ def main():
             if user_count == 0:
                 print("👤 Criando usuários padrão...")
                 default_users = [
-                    User(username="ana.luiza", password_hash=pwd_context.hash("senha123"), role="public", clearance=1),
-                    User(username="teste1", password_hash=pwd_context.hash("teste123"), role="public", clearance=1),
-                    User(username="diretor.silva", password_hash=pwd_context.hash("diretor2024"), role="director", clearance=2),
-                    User(username="ministro.ambiente", password_hash=pwd_context.hash("ministro2024"), role="minister", clearance=3),
+                    User(username="ana.luiza", password=pwd_context.hash("senha123")),
+                    User(username="teste1", password=pwd_context.hash("teste123")),
+                    User(username="demo", password=pwd_context.hash("demo123")),
+                    User(username="admin", password=pwd_context.hash("admin123")),
                 ]
                 for user in default_users:
                     db.add(user)
