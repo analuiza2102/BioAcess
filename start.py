@@ -16,10 +16,13 @@ def main():
                     key, value = line.split('=', 1)
                     os.environ.setdefault(key.strip(), value.strip())
     
-    # Configurar DATABASE_URL a partir do SUPABASE_DB_URL
-    if os.getenv("SUPABASE_DB_URL"):
-        os.environ["DATABASE_URL"] = os.getenv("SUPABASE_DB_URL")
-        print(f"🗄️  Using PostgreSQL database from Railway")
+    # Configurar DATABASE_URL a partir do SUPABASE_DB_URL (Railway ou local)
+    supabase_url = os.getenv("SUPABASE_DB_URL")
+    if supabase_url:
+        os.environ["DATABASE_URL"] = supabase_url
+        print(f"🗄️  Using PostgreSQL database: {supabase_url[:30]}...")
+    else:
+        print("⚠️  SUPABASE_DB_URL not found, using default SQLite")
     
     # Mudar para o diretório backend
     backend_dir = Path(__file__).parent / "src" / "backend"
