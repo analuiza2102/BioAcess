@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuthContext } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { api, APIError } from '../lib/api';
 import { ImageUpload } from '../components/ImageUpload';
 import { Input } from '../components/ui/input';
@@ -15,6 +16,7 @@ import { mockAPI, USE_MOCK_API } from '../lib/mockAPI';
 
 export function Enroll() {
   const { user, isAuthenticated } = useAuthContext();
+  const { theme } = useTheme();
   const [username, setUsername] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -108,24 +110,41 @@ export function Enroll() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{
+      background: theme === 'light' 
+        ? 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%)'
+        : 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #262626 100%)'
+    }}>
       <div className="w-full max-w-2xl">
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
             className="mb-4"
+            style={{
+              color: theme === 'light' ? '#15803d' : '#86efac'
+            }}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {isAuthenticated ? 'Voltar ao Dashboard' : 'Voltar para Login'}
           </Button>
           
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-600 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{
+              background: theme === 'light' 
+                ? 'linear-gradient(135deg, #16a34a, #15803d)'
+                : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
+            }}>
               <UserPlus className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl mb-2">Cadastro de Biometria</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl mb-2 font-bold" style={{
+              color: theme === 'light' ? '#0f172a' : '#f1f5f9'
+            }}>
+              Cadastro de Biometria
+            </h1>
+            <p style={{
+              color: theme === 'light' ? '#64748b' : '#94a3b8'
+            }}>
               {isAuthenticated 
                 ? `Registrando biometria para: ${user?.username}` 
                 : 'Registre sua biometria facial para acessar o sistema'
@@ -134,7 +153,14 @@ export function Enroll() {
           </div>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-8" style={{
+          background: theme === 'light' 
+            ? 'rgba(255, 255, 255, 0.9)'
+            : 'rgba(38, 38, 38, 0.9)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderColor: theme === 'light' ? '#e2e8f0' : '#404040'
+        }}>
           {!enrolled ? (
             <div className="space-y-6">
               {allowManualUsername ? (
@@ -166,14 +192,23 @@ export function Enroll() {
               )}
 
               <div className="space-y-4">
-                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h3 className="font-semibold text-green-800 mb-2">
+                <div className="text-center p-4 rounded-lg border" style={{
+                  background: theme === 'light' ? '#f0fdf4' : '#064e3b',
+                  borderColor: theme === 'light' ? '#86efac' : '#047857'
+                }}>
+                  <h3 className="font-semibold mb-2" style={{
+                    color: theme === 'light' ? '#15803d' : '#86efac'
+                  }}>
                     📸 Cadastro de Biometria
                   </h3>
-                  <p className="text-sm text-green-700">
+                  <p className="text-sm" style={{
+                    color: theme === 'light' ? '#166534' : '#6ee7b7'
+                  }}>
                     Selecione uma imagem sua (PNG/JPEG) para cadastrar sua biometria facial.
                   </p>
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs mt-1" style={{
+                    color: theme === 'light' ? '#15803d' : '#86efac'
+                  }}>
                     💡 Use imagens com fundo branco para melhor precisão
                   </p>
                 </div>
@@ -190,7 +225,13 @@ export function Enroll() {
                 <Button
                   onClick={handleSubmit}
                   disabled={!username || !selectedImage || loading}
-                  className="flex-1"
+                  className="flex-1 text-white shadow-md"
+                  style={{
+                    background: theme === 'light' 
+                      ? 'linear-gradient(135deg, #16a34a, #15803d)'
+                      : 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                    opacity: (!username || !selectedImage || loading) ? 0.5 : 1
+                  }}
                 >
                   {loading ? (
                     <>
@@ -216,21 +257,36 @@ export function Enroll() {
                 )}
               </div>
 
-              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                <p className="text-sm text-amber-900 dark:text-amber-100">
+              <div className="border rounded-lg p-4" style={{
+                background: theme === 'light' ? '#fef3c7' : '#422006',
+                borderColor: theme === 'light' ? '#fbbf24' : '#78350f'
+              }}>
+                <p className="text-sm" style={{
+                  color: theme === 'light' ? '#92400e' : '#fbbf24'
+                }}>
                   <strong>Dica:</strong> Certifique-se de estar em um ambiente bem iluminado e olhe diretamente para a câmera.
                 </p>
               </div>
             </div>
           ) : (
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full" style={{
+                background: theme === 'light' ? '#dcfce7' : '#064e3b'
+              }}>
+                <CheckCircle className="w-10 h-10" style={{
+                  color: theme === 'light' ? '#16a34a' : '#86efac'
+                }} />
               </div>
               
               <div>
-                <h3 className="mb-2">Biometria Cadastrada!</h3>
-                <p className="text-muted-foreground">
+                <h3 className="mb-2 text-xl font-bold" style={{
+                  color: theme === 'light' ? '#15803d' : '#86efac'
+                }}>
+                  Biometria Cadastrada!
+                </h3>
+                <p style={{
+                  color: theme === 'light' ? '#64748b' : '#94a3b8'
+                }}>
                   Sua biometria facial foi registrada com sucesso.
                 </p>
               </div>
@@ -238,7 +294,12 @@ export function Enroll() {
               <div className="flex gap-2">
                 <Button
                   onClick={() => navigate(isAuthenticated ? '/dashboard' : '/login')}
-                  className="flex-1"
+                  className="flex-1 text-white shadow-md"
+                  style={{
+                    background: theme === 'light' 
+                      ? 'linear-gradient(135deg, #16a34a, #15803d)'
+                      : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'
+                  }}
                 >
                   {isAuthenticated ? 'Voltar ao Dashboard' : 'Fazer Login'}
                 </Button>
