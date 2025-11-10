@@ -1,6 +1,5 @@
 [phases.setup]
-nixPkgs = ["libGL", "libGLU"]
-aptPkgs = ["python3.11", "python3-pip"]
+nixPkgs = ["libGL", "libGLU", "python311"]
 
 [start]
-cmd = "python3 start.py"
+cmd = "python start.py"
