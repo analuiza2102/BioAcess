@@ -209,9 +209,7 @@ async def login_by_camera(
             print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
             
             distance = np.linalg.norm(saved_embedding - current_embedding_array)
-            # Threshold mais restritivo: 7.0 para Facenet
-            # Valores menores = mais restritivo (menos falsos positivos)
-            threshold = 7.0
+            threshold = 10.0  # Threshold do Facenet
             
             print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
             
