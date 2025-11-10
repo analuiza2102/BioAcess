@@ -193,48 +193,41 @@ async def login_by_camera(
             
             # Gerar embedding da imagem capturada
             print(f"🔐 Gerando embedding da imagem capturada...")
-                current_embedding = df.represent(
-                    img_path=img_array,
-                    model_name='Facenet',
-                    enforce_detection=True,
-                    detector_backend='opencv'
+            current_embedding = df.represent(
+                img_path=img_array,
+                model_name='Facenet',
+                enforce_detection=True,
+                detector_backend='opencv'
+            )
+            print(f"✅ Embedding gerado com sucesso!")
+            
+            # Comparar embeddings usando distância euclidiana
+            saved_embedding = np.array(biometric.embedding)
+            current_embedding_array = np.array(current_embedding[0]['embedding'])
+            
+            print(f"🔢 Tamanho embedding salvo: {len(saved_embedding)}")
+            print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
+            
+            distance = np.linalg.norm(saved_embedding - current_embedding_array)
+            threshold = 10.0  # Threshold do Facenet (ajustável)
+            
+            print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
+            
+            if distance > threshold:
+                print(f"❌ Face não reconhecida. Distância muito alta: {distance:.2f}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail=f"Face não reconhecida. Distância: {distance:.2f}"
                 )
-                print(f"✅ Embedding gerado com sucesso!")
+            
+            print(f"✅ Face reconhecida! Usuário: {username}")
+            confidence = 1.0 - (distance / threshold)
+            faces_detected = len(faces)
                 
-                # Comparar embeddings usando distância euclidiana
-                saved_embedding = np.array(biometric.embedding)
-                current_embedding_array = np.array(current_embedding[0]['embedding'])
-                
-                print(f"🔢 Tamanho embedding salvo: {len(saved_embedding)}")
-                print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
-                
-                distance = np.linalg.norm(saved_embedding - current_embedding_array)
-                threshold = 10.0  # Threshold do Facenet (ajustável)
-                
-                print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
-                
-                if distance > threshold:
-                    print(f"❌ Face não reconhecida. Distância muito alta: {distance:.2f}")
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail=f"Face não reconhecida. Distância: {distance:.2f}"
-                    )
-                
-                print(f"✅ Face reconhecida! Usuário: {username}")
-                confidence = 1.0 - (distance / threshold)
-                faces_detected = len(faces)
-                
-            except Exception as deepface_error:
-                print(f"❌ DeepFace não disponível: {deepface_error}")
-                # Fallback: aceitar login se tiver biometria cadastrada (modo desenvolvimento)
-                print(f"⚠️ MODO DESENVOLVIMENTO: Permitindo login sem verificação DeepFace")
-                confidence = 0.5
-                faces_detected = 1
-        
         except Exception as load_error:
-            print(f"⚠️ DeepFace não pode ser carregado: {load_error}")
+            print(f"⚠️ DeepFace não disponível: {load_error}")
             print(f"⚠️ MODO DESENVOLVIMENTO: Permitindo login sem verificação DeepFace")
-            # Modo simplificado: se usuário tem biometria cadastrada, permite login
+            # Fallback: aceitar login se tiver biometria cadastrada (modo desenvolvimento)
             confidence = 0.5
             faces_detected = 1
         
