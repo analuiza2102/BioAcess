@@ -410,3 +410,181 @@ async def enroll_biometric(
             status_code=500,
             detail="Erro interno no servidor"
         )
+
+
+# ===============================================
+# ENDPOINTS DE CADASTRO DE USUÁRIOS
+# ===============================================
+
+class RegisterUserRequest(BaseModel):
+    username: str
+    password: str
+    role: str = "public"  # public, director, minister
+    clearance: int = 1  # 1, 2, ou 3
+
+@router.post("/register")
+def register_user(
+    body: RegisterUserRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Cadastrar novo usuário
+    Requer autenticação (qualquer usuário logado pode cadastrar)
+    """
+    try:
+        print(f"👤 Cadastro de novo usuário: {body.username} por {current_user['username']}")
+        
+        # Verificar se usuário já existe
+        existing_user = db.execute(
+            select(User).where(User.username == body.username)
+        ).scalar_one_or_none()
+        
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Usuário '{body.username}' já existe"
+            )
+        
+        # Validar clearance
+        if body.clearance not in [1, 2, 3]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Clearance deve ser 1, 2 ou 3"
+            )
+        
+        # Validar role
+        valid_roles = ["public", "director", "minister"]
+        if body.role not in valid_roles:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Role deve ser um de: {', '.join(valid_roles)}"
+            )
+        
+        # Criar hash da senha
+        password_hash = pwd_context.hash(body.password)
+        
+        # Criar novo usuário
+        new_user = User(
+            username=body.username,
+            password_hash=password_hash,
+            role=body.role,
+            clearance=body.clearance
+        )
+        
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        print(f"✅ Usuário '{body.username}' criado com sucesso!")
+        
+        return {
+            "message": "Usuário cadastrado com sucesso",
+            "user": {
+                "username": new_user.username,
+                "role": new_user.role,
+                "clearance": new_user.clearance,
+                "created_at": new_user.created_at.isoformat() if new_user.created_at else None
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro ao cadastrar usuário: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao cadastrar usuário: {str(e)}"
+        )
+
+
+@router.get("/users")
+def list_users(
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Listar todos os usuários
+    Requer autenticação
+    """
+    try:
+        users = db.execute(select(User)).scalars().all()
+        
+        return {
+            "total": len(users),
+            "users": [
+                {
+                    "username": user.username,
+                    "role": user.role,
+                    "clearance": user.clearance,
+                    "created_at": user.created_at.isoformat() if user.created_at else None
+                }
+                for user in users
+            ]
+        }
+    except Exception as e:
+        print(f"❌ Erro ao listar usuários: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Erro ao listar usuários"
+        )
+
+
+@router.delete("/users/{username}")
+def delete_user(
+    username: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Deletar usuário
+    Requer autenticação
+    Não permite deletar o próprio usuário
+    """
+    try:
+        # Não permitir deletar a si mesmo
+        if username == current_user['username']:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Você não pode deletar seu próprio usuário"
+            )
+        
+        # Buscar usuário
+        user = db.execute(
+            select(User).where(User.username == username)
+        ).scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Usuário '{username}' não encontrado"
+            )
+        
+        # Deletar biometrias associadas
+        biometrics = db.execute(
+            select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
+        ).scalars().all()
+        
+        for bio in biometrics:
+            db.delete(bio)
+        
+        # Deletar usuário
+        db.delete(user)
+        db.commit()
+        
+        print(f"✅ Usuário '{username}' deletado com sucesso!")
+        
+        return {
+            "message": f"Usuário '{username}' deletado com sucesso"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro ao deletar usuário: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao deletar usuário: {str(e)}"
+        )
