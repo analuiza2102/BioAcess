@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import io
 from PIL import Image
 import numpy as np
+import face_recognition
 
 from app.config import get_db, Base, engine
 from app.models.user import User
@@ -17,20 +18,6 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Ensure tables exist
 Base.metadata.create_all(bind=engine)
-
-# Lazy loading do DeepFace para economizar memória inicial
-_deepface_loaded = False
-DeepFace = None
-
-def load_deepface():
-    """Carrega DeepFace apenas quando necessário"""
-    global _deepface_loaded, DeepFace
-    if not _deepface_loaded:
-        from deepface import DeepFace as DF
-        DeepFace = DF
-        _deepface_loaded = True
-        print("✅ DeepFace carregado com sucesso")
-    return DeepFace
 
 # Create a demo user if DB is empty (only for first run / local tests)
 from sqlalchemy import select
@@ -138,7 +125,7 @@ async def login_by_camera(
 ):
     """
     Login via reconhecimento facial usando câmera
-    Usa DeepFace integrado para detecção e verificação facial
+    Usa face_recognition (dlib) para detecção e verificação facial
     """
     try:
         # Verificar se usuário existe
@@ -149,17 +136,16 @@ async def login_by_camera(
                 detail="Usuário não encontrado"
             )
         
-        # Usar reconhecimento facial local com DeepFace
         print(f"🔍 Processando reconhecimento facial para usuário: {username}")
         
         # Ler imagem e converter para RGB
         image_bytes = await image.read()
         img = Image.open(io.BytesIO(image_bytes))
         
-        # Converter para RGB se necessário (remove canal alpha se existir)
+        # Converter para RGB se necessário
         if img.mode != 'RGB':
             img = img.convert('RGB')
-            print(f"🔄 Imagem convertida de {img.mode} para RGB")
+            print(f"🔄 Imagem convertida para RGB")
         
         img_array = np.array(img)
         print(f"📐 Shape da imagem: {img_array.shape}")
@@ -178,43 +164,43 @@ async def login_by_camera(
         
         print(f"✅ Biometria encontrada para user_id={user.id}")
         
-        # Tentar carregar DeepFace (se falhar, usa modo simplificado)
+        # Usar face_recognition para detecção e comparação
         try:
-            df = load_deepface()
+            # Detectar faces na imagem
+            face_locations = face_recognition.face_locations(img_array)
             
-            # Tentar detectar face
-            faces = df.extract_faces(img_array, enforce_detection=True)
-            
-            if not faces or len(faces) == 0:
+            if not face_locations or len(face_locations) == 0:
+                print(f"❌ Nenhuma face detectada na imagem")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Nenhuma face detectada na imagem"
+                    detail="Nenhuma face detectada na imagem. Use uma foto clara com seu rosto visível."
                 )
             
-            # Gerar embedding da imagem capturada
-            print(f"🔐 Gerando embedding da imagem capturada...")
-            current_embedding = df.represent(
-                img_path=img_array,
-                model_name='Facenet',
-                enforce_detection=True,
-                detector_backend='opencv'
-            )
-            print(f"✅ Embedding gerado com sucesso!")
+            print(f"✅ {len(face_locations)} face(s) detectada(s)")
             
-            # Comparar embeddings usando distância euclidiana
+            # Gerar encoding da face capturada
+            current_encodings = face_recognition.face_encodings(img_array, face_locations)
+            
+            if not current_encodings or len(current_encodings) == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Não foi possível processar a face detectada"
+                )
+            
+            current_encoding = current_encodings[0]
+            print(f"🔐 Encoding gerado com sucesso! Tamanho: {len(current_encoding)}")
+            
+            # Comparar com embedding salvo
             saved_embedding = np.array(biometric.embedding)
-            current_embedding_array = np.array(current_embedding[0]['embedding'])
             
-            print(f"🔢 Tamanho embedding salvo: {len(saved_embedding)}")
-            print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
+            # Calcular distância euclidiana
+            distance = np.linalg.norm(saved_embedding - current_encoding)
+            threshold = 0.6  # Threshold padrão do face_recognition
             
-            distance = np.linalg.norm(saved_embedding - current_embedding_array)
-            threshold = 10.0  # Threshold do Facenet
-            
-            print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
+            print(f"📊 Distância euclidiana: {distance:.4f} (threshold: {threshold})")
             
             if distance > threshold:
-                print(f"❌ Face não reconhecida. Distância muito alta: {distance:.2f}")
+                print(f"❌ Face não reconhecida. Distância muito alta: {distance:.4f}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail=f"Face não reconhecida. Identidade não corresponde ao usuário {username}."
@@ -222,14 +208,17 @@ async def login_by_camera(
             
             print(f"✅ Face reconhecida! Usuário: {username}")
             confidence = 1.0 - (distance / threshold)
-            faces_detected = len(faces)
+            faces_detected = len(face_locations)
                 
-        except Exception as load_error:
-            print(f"⚠️ DeepFace não disponível: {load_error}")
-            print(f"❌ Reconhecimento facial indisponível - Login negado por segurança")
+        except HTTPException:
+            raise
+        except Exception as e:
+            print(f"❌ Erro no reconhecimento facial: {e}")
+            import traceback
+            traceback.print_exc()
             raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Sistema de reconhecimento facial temporariamente indisponível. Por favor, use o login tradicional com usuário e senha."
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Erro no processamento facial: {str(e)}"
             )
         
         # Gerar token
@@ -315,6 +304,7 @@ async def enroll_biometric(
 ):
     """
     Cadastro de biometria facial via upload de imagem
+    Usa face_recognition (dlib) para encoding facial
     """
     try:
         # Verificar se usuário existe
@@ -332,74 +322,67 @@ async def enroll_biometric(
         if img.mode != 'RGB':
             img = img.convert('RGB')
         
-        # Carregar DeepFace
-        df = load_deepface()
-        
         # Converter para numpy array
         img_array = np.array(img)
         
-        # Validar que há um rosto na imagem
-        try:
-            faces = df.extract_faces(
-                img_path=img_array,
-                detector_backend='opencv',
-                enforce_detection=True
-            )
-            
-            if not faces or len(faces) == 0:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Nenhum rosto detectado na imagem. Use uma foto clara com seu rosto visível."
-                )
-            
-            if len(faces) > 1:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Múltiplos rostos detectados. Use uma foto com apenas um rosto."
-                )
-            
-            # Gerar embedding da face
-            print(f"🔐 Gerando embedding facial para {username}...")
-            embedding = df.represent(
-                img_path=img_array,
-                model_name='Facenet',
-                enforce_detection=True,
-                detector_backend='opencv'
-            )
-            
-            # Verificar se já existe biometria cadastrada
-            from sqlalchemy import select
-            existing_biometric = db.execute(
-                select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
-            ).scalar_one_or_none()
-            
-            if existing_biometric:
-                # Atualizar embedding existente
-                existing_biometric.embedding = embedding[0]['embedding']
-                print(f"🔄 Biometria atualizada para {username}")
-            else:
-                # Criar novo registro
-                new_biometric = BiometricTemplate(
-                    user_id=user.id,
-                    embedding=embedding[0]['embedding']
-                )
-                db.add(new_biometric)
-                print(f"✅ Biometria cadastrada para {username}")
-            
-            db.commit()
-            
-            return {
-                "success": True,
-                "message": "Biometria cadastrada com sucesso!",
-                "username": username,
-                "face_detected": True
-            }
-            
-        except ValueError as e:
+        print(f"🔐 Processando cadastro de biometria para {username}...")
+        
+        # Detectar faces usando face_recognition
+        face_locations = face_recognition.face_locations(img_array)
+        
+        if not face_locations or len(face_locations) == 0:
             raise HTTPException(
                 status_code=400,
-                detail=f"Erro na detecção facial: {str(e)}"
+                detail="Nenhum rosto detectado na imagem. Use uma foto clara com seu rosto visível."
             )
+        
+        if len(face_locations) > 1:
+            raise HTTPException(
+                status_code=400,
+                detail="Múltiplos rostos detectados. Use uma foto com apenas um rosto."
+            )
+        
+        print(f"✅ Face detectada! Gerando encoding...")
+        
+        # Gerar encoding da face
+        face_encodings = face_recognition.face_encodings(img_array, face_locations)
+        
+        if not face_encodings or len(face_encodings) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Não foi possível processar a face detectada. Tente outra foto."
+            )
+        
+        embedding = face_encodings[0].tolist()  # Converter para lista para salvar no banco
+        print(f"✅ Encoding gerado! Tamanho: {len(embedding)}")
+        
+        # Verificar se já existe biometria cadastrada
+        from sqlalchemy import select
+        existing_biometric = db.execute(
+            select(BiometricTemplate).where(BiometricTemplate.user_id == user.id)
+        ).scalar_one_or_none()
+        
+        if existing_biometric:
+            # Atualizar embedding existente
+            existing_biometric.embedding = embedding
+            print(f"🔄 Biometria atualizada para {username}")
+        else:
+            # Criar novo registro
+            new_biometric = BiometricTemplate(
+                user_id=user.id,
+                embedding=embedding
+            )
+            db.add(new_biometric)
+            print(f"✅ Biometria cadastrada para {username}")
+        
+        db.commit()
+        
+        return {
+            "success": True,
+            "message": "Biometria cadastrada com sucesso!",
+            "username": username,
+            "face_detected": True
+        }
             
     except HTTPException:
         raise
@@ -409,7 +392,7 @@ async def enroll_biometric(
         traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail="Erro interno no servidor"
+            detail=f"Erro interno no servidor: {str(e)}"
         )
 
 
