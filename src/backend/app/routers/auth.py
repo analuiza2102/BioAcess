@@ -35,12 +35,16 @@ def load_deepface():
 # Create a demo user if DB is empty (only for first run / local tests)
 from sqlalchemy import select
 def _ensure_demo_user(db: Session):
-    exists = db.execute(select(User).where(User.username == "ana.luiza")).scalar_one_or_none()
-    if not exists:
-        pwd = CryptContext(schemes=["bcrypt"], deprecated="auto").hash("senha123")
-        db.add(User(username="ana.luiza", password_hash=pwd, role="public", clearance=1))
-        db.commit()
-        print("✅ Usuário demo 'ana.luiza' criado")
+    try:
+        exists = db.execute(select(User).where(User.username == "ana.luiza")).scalar_one_or_none()
+        if not exists:
+            pwd_hash = pwd_context.hash("senha123")
+            db.add(User(username="ana.luiza", password_hash=pwd_hash, role="public", clearance=1))
+            db.commit()
+            print("✅ Usuário demo 'ana.luiza' criado")
+    except Exception as e:
+        print(f"⚠️ Erro ao criar usuário demo: {e}")
+        db.rollback()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -92,9 +96,6 @@ def login_user(body: LoginRequest, db: Session = Depends(get_db)):
     """
     try:
         print(f"🔐 Tentativa de login: username={body.username}")
-        
-        # bootstrap demo user (safe for dev; remove in prod)
-        _ensure_demo_user(db)
 
         from sqlalchemy import select
         user = db.execute(select(User).where(User.username == body.username)).scalar_one_or_none()
