@@ -88,7 +88,7 @@ def main():
         import uvicorn
         print("🌟 Starting uvicorn server...")
         
-        # Configurações para Railway (com TensorFlow/DeepFace)
+        # Configurações para Railway (com face_recognition/dlib)
         uvicorn.run(
             "app.main:app",
             host="0.0.0.0",

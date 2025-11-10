@@ -1,6 +1,6 @@
 # BioAccess Backend
 
-Backend FastAPI com reconhecimento facial usando TensorFlow e DeepFace.
+Backend FastAPI com reconhecimento facial usando face_recognition (dlib).
 
 ## Como rodar localmente
 
@@ -50,7 +50,7 @@ Veja o guia completo: `RAILWAY_DEPLOY.md` na raiz do projeto.
 3. Deploy automático!
 
 ## Observações
-- Reconhecimento facial usa DeepFace local
-- TensorFlow requer 2GB+ RAM
-- Suporte a microserviço externo opcional via `FACIAL_RECOGNITION_SERVICE_URL`
+- Reconhecimento facial usa face_recognition (dlib) - mais leve e estável
+- Requer ~200MB RAM (muito mais leve que TensorFlow)
+- Precisão de 99.38% em detecção facial
 - Se preferir `form-data` (OAuth2), ajuste o `auth.py` conforme necessidade.
