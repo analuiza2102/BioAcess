@@ -306,29 +306,42 @@ async def enroll_biometric(
     Cadastro de biometria facial via upload de imagem
     Usa face_recognition (dlib) para encoding facial
     """
+    print(f"🔍 Recebendo requisição de cadastro para: {username}")
+    print(f"📁 Arquivo: {image.filename}, Content-Type: {image.content_type}")
+    
     try:
         # Verificar se usuário existe
         from sqlalchemy import select
         user = db.execute(select(User).where(User.username == username)).scalar_one_or_none()
         
         if not user:
+            print(f"❌ Usuário {username} não encontrado no banco")
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
+        
+        print(f"✅ Usuário {username} encontrado (ID: {user.id})")
         
         # Ler e validar imagem
         contents = await image.read()
+        print(f"📦 Tamanho da imagem: {len(contents)} bytes")
+        
         img = Image.open(io.BytesIO(contents))
+        print(f"🖼️ Imagem carregada: {img.size}, modo: {img.mode}")
         
         # Converter para RGB se necessário
         if img.mode != 'RGB':
             img = img.convert('RGB')
+            print(f"🔄 Imagem convertida para RGB")
         
         # Converter para numpy array
         img_array = np.array(img)
+        print(f"📐 Array shape: {img_array.shape}")
         
         print(f"🔐 Processando cadastro de biometria para {username}...")
         
         # Detectar faces usando face_recognition
+        print(f"🔍 Detectando faces...")
         face_locations = face_recognition.face_locations(img_array)
+        print(f"📍 {len(face_locations)} face(s) detectada(s)")
         
         if not face_locations or len(face_locations) == 0:
             raise HTTPException(
@@ -387,7 +400,7 @@ async def enroll_biometric(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Erro no cadastro de biometria: {e}")
+        print(f"❌ Erro no cadastro de biometria para {username}: {e}")
         import traceback
         traceback.print_exc()
         raise HTTPException(
