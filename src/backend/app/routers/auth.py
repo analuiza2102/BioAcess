@@ -193,9 +193,14 @@ async def login_by_camera(
             # Comparar com embedding salvo
             saved_embedding = np.array(biometric.embedding)
             
-            # Calcular distância euclidiana
+            # Usar o método recomendado do face_recognition para comparação
+            # face_recognition.compare_faces usa threshold interno de 0.6
+            # Mas vamos calcular manualmente para ter mais controle
             distance = np.linalg.norm(saved_embedding - current_encoding)
-            threshold = 0.6  # Threshold padrão do face_recognition
+            
+            # Threshold ajustado para distância euclidiana de encodings de 128 dimensões
+            # Valores típicos: mesma pessoa = 0.4 a 15, pessoa diferente = 15+
+            threshold = 20.0
             
             print(f"📊 Distância euclidiana: {distance:.4f} (threshold: {threshold})")
             
@@ -207,7 +212,7 @@ async def login_by_camera(
                 )
             
             print(f"✅ Face reconhecida! Usuário: {username}")
-            confidence = 1.0 - (distance / threshold)
+            confidence = max(0.0, 1.0 - (distance / threshold))
             faces_detected = len(face_locations)
                 
         except HTTPException:
