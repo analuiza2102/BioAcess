@@ -33,12 +33,12 @@ allowed_origins = list(dict.fromkeys([*default_origins, *env_origins]))
 
 print("🌐 CORS Origins configuradas:", allowed_origins)
 
+# Adicionar CORS ANTES de qualquer outra coisa
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_origin_regex=r"^https://.*\.vercel\.app$",
+    allow_origins=["*"],  # Temporariamente aceitar todas as origens para debug
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
     max_age=3600,
