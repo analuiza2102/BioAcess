@@ -148,7 +148,16 @@ export function Login() {
         navigate('/dashboard');
       }, 100);
     } catch (error: any) {
-      toast.error('Falha no reconhecimento facial. Tente novamente.');
+      console.error('❌ Erro no login facial:', error);
+      
+      // Tratar erro 503 (serviço indisponível)
+      if (error.response?.status === 503) {
+        toast.error('Sistema de reconhecimento facial temporariamente indisponível. Use o login tradicional com usuário e senha.');
+      } else if (error.response?.data?.detail) {
+        toast.error(error.response.data.detail);
+      } else {
+        toast.error('Falha no reconhecimento facial. Verifique se sua face está visível e bem iluminada.');
+      }
     } finally {
       setLoading(false);
     }

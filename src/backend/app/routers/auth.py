@@ -209,7 +209,9 @@ async def login_by_camera(
             print(f"🔢 Tamanho embedding atual: {len(current_embedding_array)}")
             
             distance = np.linalg.norm(saved_embedding - current_embedding_array)
-            threshold = 10.0  # Threshold do Facenet (ajustável)
+            # Threshold mais restritivo: 7.0 para Facenet
+            # Valores menores = mais restritivo (menos falsos positivos)
+            threshold = 7.0
             
             print(f"📊 Distância euclidiana: {distance:.2f} (threshold: {threshold})")
             
@@ -217,7 +219,7 @@ async def login_by_camera(
                 print(f"❌ Face não reconhecida. Distância muito alta: {distance:.2f}")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail=f"Face não reconhecida. Distância: {distance:.2f}"
+                    detail=f"Face não reconhecida. Identidade não corresponde ao usuário {username}."
                 )
             
             print(f"✅ Face reconhecida! Usuário: {username}")
@@ -226,10 +228,11 @@ async def login_by_camera(
                 
         except Exception as load_error:
             print(f"⚠️ DeepFace não disponível: {load_error}")
-            print(f"⚠️ MODO DESENVOLVIMENTO: Permitindo login sem verificação DeepFace")
-            # Fallback: aceitar login se tiver biometria cadastrada (modo desenvolvimento)
-            confidence = 0.5
-            faces_detected = 1
+            print(f"❌ Reconhecimento facial indisponível - Login negado por segurança")
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Sistema de reconhecimento facial temporariamente indisponível. Por favor, use o login tradicional com usuário e senha."
+            )
         
         # Gerar token
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -577,6 +580,58 @@ def delete_user(
         
         return {
             "message": f"Usuário '{username}' deletado com sucesso"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Erro ao deletar usuário: {e}")
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Erro ao deletar usuário: {str(e)}"
+        )
+
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+
+@router.put("/users/{username}/reset-password")
+def reset_user_password(
+    username: str,
+    body: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Resetar senha de um usuário
+    Requer autenticação
+    """
+    try:
+        # Buscar usuário
+        user = db.execute(
+            select(User).where(User.username == username)
+        ).scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Usuário '{username}' não encontrado"
+            )
+        
+        # Criar hash da nova senha
+        new_password_hash = pwd_context.hash(body.new_password)
+        
+        # Atualizar senha
+        user.password_hash = new_password_hash
+        db.commit()
+        
+        print(f"✅ Senha do usuário '{username}' resetada com sucesso!")
+        
+        return {
+            "message": f"Senha do usuário '{username}' resetada com sucesso",
+            "username": username
         }
         
     except HTTPException:

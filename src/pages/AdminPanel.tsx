@@ -9,7 +9,9 @@ import {
   Shield,
   Sun,
   Moon,
-  AlertCircle
+  AlertCircle,
+  Key,
+  Copy
 } from 'lucide-react';
 import { useAuthContext } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -24,6 +26,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -50,6 +53,9 @@ export function AdminPanel() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [newPassword, setNewPassword] = useState('');
   
   // Formulário de novo usuário
   const [newUser, setNewUser] = useState({
@@ -155,6 +161,41 @@ export function AdminPanel() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!token || !selectedUser) return;
+    
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://bioacess-production.up.railway.app'}/auth/users/${selectedUser}/reset-password`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ new_password: newPassword })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Erro ao resetar senha');
+      }
+      
+      toast.success(`Senha do usuário "${selectedUser}" resetada com sucesso!`);
+      setResetDialogOpen(false);
+      setSelectedUser('');
+      setNewPassword('');
+    } catch (error: any) {
+      console.error('Erro ao resetar senha:', error);
+      toast.error(error.message || 'Erro ao resetar senha');
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copiado para a área de transferência!');
+  };
+
   const getRoleBadgeColor = (clearance: number) => {
     switch (clearance) {
       case 1:
@@ -211,6 +252,7 @@ export function AdminPanel() {
               variant="outline"
               size="sm"
               onClick={() => navigate('/dashboard')}
+              className="cursor-pointer"
             >
               Voltar ao Dashboard
             </Button>
@@ -218,7 +260,7 @@ export function AdminPanel() {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="p-2"
+              className="p-2 cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </Button>
@@ -229,6 +271,7 @@ export function AdminPanel() {
                 logout();
                 navigate('/login');
               }}
+              className="cursor-pointer"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sair
@@ -240,10 +283,13 @@ export function AdminPanel() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Warning */}
-        <Card className="p-4 mb-6 border-2 bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
+        <Card className="p-4 mb-6 border-2" style={{
+          background: theme === 'light' ? '#fef2f2' : 'rgba(127, 29, 29, 0.3)',
+          borderColor: theme === 'light' ? '#fecaca' : 'rgba(220, 38, 38, 0.5)'
+        }}>
           <div className="flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-            <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+            <AlertCircle className="w-5 h-5" style={{ color: theme === 'light' ? '#dc2626' : '#fca5a5' }} />
+            <p className="text-sm font-medium" style={{ color: theme === 'light' ? '#991b1b' : '#fca5a5' }}>
               Área restrita! Apenas o administrador (ana.luiza) tem acesso a esta página.
             </p>
           </div>
@@ -262,7 +308,7 @@ export function AdminPanel() {
 
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-green-600 hover:bg-green-700">
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer">
                 <UserPlus className="w-4 h-4 mr-2" />
                 Novo Usuário
               </Button>
@@ -323,7 +369,7 @@ export function AdminPanel() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full cursor-pointer">
                   Cadastrar Usuário
                 </Button>
               </form>
@@ -370,14 +416,30 @@ export function AdminPanel() {
                   </div>
 
                   {u.username !== 'ana.luiza' && (
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteUser(u.username)}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Deletar
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedUser(u.username);
+                          setNewPassword('');
+                          setResetDialogOpen(true);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Key className="w-4 h-4 mr-2" />
+                        Resetar Senha
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteUser(u.username)}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Deletar
+                      </Button>
+                    </div>
                   )}
                 </div>
               </Card>
@@ -385,6 +447,67 @@ export function AdminPanel() {
           </div>
         )}
       </main>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resetar Senha - {selectedUser}</DialogTitle>
+            <DialogDescription>
+              Digite uma nova senha para o usuário. Certifique-se de copiar e guardar a senha antes de fechar.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">Nova Senha</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="newPassword"
+                    type="text"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Digite a nova senha"
+                    required
+                    minLength={6}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => copyToClipboard(newPassword)}
+                    disabled={!newPassword}
+                    title="Copiar senha"
+                    className="cursor-pointer"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Mínimo de 6 caracteres
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setResetDialogOpen(false);
+                  setNewPassword('');
+                  setSelectedUser('');
+                }}
+                className="cursor-pointer"
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" className="cursor-pointer">
+                Resetar Senha
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
