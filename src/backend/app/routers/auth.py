@@ -37,9 +37,10 @@ from sqlalchemy import select
 def _ensure_demo_user(db: Session):
     exists = db.execute(select(User).where(User.username == "ana.luiza")).scalar_one_or_none()
     if not exists:
-        pwd = CryptContext(schemes=["bcrypt"], deprecated="auto").hash("admin123")
-        db.add(User(username="ana.luiza", password=pwd))
+        pwd = CryptContext(schemes=["bcrypt"], deprecated="auto").hash("senha123")
+        db.add(User(username="ana.luiza", password_hash=pwd, role="public", clearance=1))
         db.commit()
+        print("✅ Usuário demo 'ana.luiza' criado")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -90,20 +91,27 @@ def login_user(body: LoginRequest, db: Session = Depends(get_db)):
     This endpoint is JSON-based to match the current frontend implementation.
     """
     try:
+        print(f"🔐 Tentativa de login: username={body.username}")
+        
         # bootstrap demo user (safe for dev; remove in prod)
         _ensure_demo_user(db)
 
         from sqlalchemy import select
         user = db.execute(select(User).where(User.username == body.username)).scalar_one_or_none()
         if not user:
+            print(f"❌ Usuário não encontrado: {body.username}")
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
 
+        print(f"✅ Usuário encontrado: {user.username}, verificando senha...")
         if not pwd_context.verify(body.password, user.password_hash):
+            print(f"❌ Senha incorreta para: {body.username}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Senha incorreta")
 
+        print(f"✅ Senha correta, gerando token...")
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         token = jwt.encode({"sub": user.username, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
+        print(f"✅ Login bem-sucedido: {user.username}")
         return {
             "access_token": token,
             "token_type": "bearer",
@@ -115,8 +123,10 @@ def login_user(body: LoginRequest, db: Session = Depends(get_db)):
         raise
     except Exception as e:
         # Log server-side and return a clean message
-        print("Erro interno no /auth/login:", repr(e))
-        raise HTTPException(status_code=500, detail="Erro interno no servidor")
+        print("❌ Erro interno no /auth/login:", repr(e))
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 
 @router.post("/login/camera")
