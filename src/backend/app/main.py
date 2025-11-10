@@ -38,15 +38,22 @@ app.add_middleware(
     allow_origins=allowed_origins,
     allow_origin_regex=r"^https://.*\.vercel\.app$",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
+    max_age=3600,
 )
 
 # ---- Routers ----
 app.include_router(auth.router)
 app.include_router(data.router)
 app.include_router(reports.router)
+
+# ---- Health Check ----
+@app.get("/")
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "BioAccess API is running"}
 
 @app.get("/")
 def root():
