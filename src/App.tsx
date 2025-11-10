@@ -8,6 +8,7 @@ import { Register } from './pages/Register';
 import { Enroll } from './pages/Enroll';
 import { Dashboard } from './pages/Dashboard';
 import { Reports } from './pages/Reports';
+import { AdminPanel } from './pages/AdminPanel';
 import { AccessDenied } from './pages/AccessDenied';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -28,6 +29,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPanel />
               </ProtectedRoute>
             }
           />
