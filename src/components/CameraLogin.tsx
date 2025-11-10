@@ -355,14 +355,17 @@ export function CameraLogin({ onCapture, onCancel, loading = false }: CameraLogi
         <div className="flex flex-col gap-2 md:gap-3">
           <Button
             onClick={capturePhoto}
-            className="w-full py-2 md:py-3 text-sm md:text-base font-medium"
+            className="w-full py-2 md:py-3 text-sm md:text-base font-medium cursor-pointer"
             disabled={!isReady || loading}
             style={{
               background: theme === 'light' 
-                ? 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)'
-                : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
+                : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
               color: '#ffffff',
-              border: 'none'
+              border: 'none',
+              boxShadow: theme === 'light' 
+                ? '0 4px 6px -1px rgba(34, 197, 94, 0.3), 0 2px 4px -1px rgba(34, 197, 94, 0.2)'
+                : '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)'
             }}
           >
             {loading ? (
