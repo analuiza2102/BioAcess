@@ -190,7 +190,7 @@ export function Dashboard() {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate('/admin')}
-                className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900"
+                className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 cursor-pointer"
               >
                 <Shield className="w-4 h-4 mr-2" />
                 Admin
@@ -200,7 +200,7 @@ export function Dashboard() {
               variant="outline"
               size="sm"
               onClick={toggleTheme}
-              className="p-2"
+              className="p-2 cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </Button>
@@ -208,6 +208,7 @@ export function Dashboard() {
               variant="outline"
               size="sm"
               onClick={handleLogout}
+              className="cursor-pointer"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sair
@@ -335,7 +336,7 @@ export function Dashboard() {
                 onClick={() => {
                   navigate('/enroll');
                 }}
-                className="text-white shadow-lg"
+                className="text-white shadow-lg cursor-pointer"
                 size="lg"
                 disabled={loadingBiometric}
                 style={{
@@ -355,7 +356,7 @@ export function Dashboard() {
                   onClick={() => {
                     checkBiometricStatus();
                   }}
-                  className="text-white shadow-md hover:opacity-90"
+                  className="text-white shadow-md hover:opacity-90 cursor-pointer"
                   size="sm"
                   disabled={loadingBiometric}
                   style={{
@@ -369,7 +370,7 @@ export function Dashboard() {
                 </Button>
                 <Button
                   onClick={() => navigate('/enroll')}
-                  className="text-white shadow-md"
+                  className="text-white shadow-md cursor-pointer"
                   size="sm"
                   style={{
                     background: theme === 'light' 
@@ -501,7 +502,7 @@ export function Dashboard() {
                   <Button
                     onClick={() => handleAccessLevel(levelInfo.level)}
                     disabled={!hasLevelAccess || isLoading}
-                    className="w-full font-medium shadow-md hover:opacity-90"
+                    className="w-full font-medium shadow-md hover:opacity-90 cursor-pointer"
                     size="lg"
                     style={{
                       background: hasLevelAccess 
@@ -512,7 +513,8 @@ export function Dashboard() {
                       color: hasLevelAccess ? '#ffffff' : (theme === 'light' ? '#64748b' : '#9ca3af'),
                       border: hasLevelAccess 
                         ? (theme === 'light' ? '1px solid #15803d' : '1px solid #1d4ed8')
-                        : (theme === 'light' ? '1px solid #e2e8f0' : '1px solid #4b5563')
+                        : (theme === 'light' ? '1px solid #e2e8f0' : '1px solid #4b5563'),
+                      cursor: hasLevelAccess ? 'pointer' : 'not-allowed'
                     }}
                   >
                     {isLoading ? (
